@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Plus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface JobPosting {
   id: string;
@@ -24,6 +26,48 @@ const RecruitmentEditor = () => {
       imageUrl: "/placeholder.svg",
     },
   ]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // Update recruitment status
+      const { error: recruitmentError } = await supabase
+        .from('association')
+        .update({ is_open_for_recruitment: isRecruiting })
+        .eq('id', '1');
+
+      if (recruitmentError) throw recruitmentError;
+
+      // Delete existing jobs
+      const { error: deleteError } = await supabase
+        .from('association_jobs')
+        .delete()
+        .neq('id', '0');
+
+      if (deleteError) throw deleteError;
+
+      // Insert new jobs
+      if (jobPostings.length > 0) {
+        const { error: jobsError } = await supabase
+          .from('association_jobs')
+          .insert(
+            jobPostings.map(job => ({
+              association_id: '1',
+              title: job.title,
+              description: job.description,
+              image: job.imageUrl
+            }))
+          );
+
+        if (jobsError) throw jobsError;
+      }
+
+      toast.success("Modifications enregistrées avec succès");
+    } catch (error) {
+      console.error('Error saving recruitment data:', error);
+      toast.error("Erreur lors de l'enregistrement des modifications");
+    }
+  };
 
   const addJobPosting = () => {
     const newPosting: JobPosting = {
@@ -48,7 +92,7 @@ const RecruitmentEditor = () => {
   };
 
   return (
-    <main className="flex-1 p-6 overflow-auto">
+    <form onSubmit={handleSubmit} className="flex-1 p-6 overflow-auto">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Gestion du recrutement</h2>
@@ -73,7 +117,7 @@ const RecruitmentEditor = () => {
           <>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Offres d'emploi</h3>
-              <Button onClick={addJobPosting}>
+              <Button type="button" onClick={addJobPosting}>
                 <Plus className="w-4 h-4 mr-2" />
                 Ajouter une offre
               </Button>
@@ -126,6 +170,7 @@ const RecruitmentEditor = () => {
                     </div>
 
                     <Button
+                      type="button"
                       variant="destructive"
                       size="sm"
                       className="w-full"
@@ -138,14 +183,14 @@ const RecruitmentEditor = () => {
                 </Card>
               ))}
             </div>
-
-            <Button type="submit" className="w-full">
-              Enregistrer les modifications
-            </Button>
           </>
         )}
+
+        <Button type="submit" className="w-full">
+          Enregistrer les modifications
+        </Button>
       </div>
-    </main>
+    </form>
   );
 };
 

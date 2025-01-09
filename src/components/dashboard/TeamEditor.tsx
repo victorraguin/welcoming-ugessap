@@ -93,7 +93,7 @@ const TeamEditor = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Gestion de l'équipe</h2>
-          <Button onClick={addTeamMember} type="button">Ajouter un membre</Button>
+          <Button type="button" onClick={addTeamMember}>Ajouter un membre</Button>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
