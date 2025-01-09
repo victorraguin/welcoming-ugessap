@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface TeamMember {
   id: string;
@@ -55,12 +57,43 @@ const TeamEditor = () => {
     );
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // First, delete all existing team members
+      const { error: deleteError } = await supabase
+        .from('team')
+        .delete()
+        .neq('id', '0'); // Delete all records
+
+      if (deleteError) throw deleteError;
+
+      // Then insert all current team members
+      const { error: insertError } = await supabase
+        .from('team')
+        .insert(
+          teamMembers.map(member => ({
+            person_name: member.name,
+            job_title: member.role,
+            image: member.photoUrl,
+            service_id: null, // You might want to map this to actual service IDs
+          }))
+        );
+
+      if (insertError) throw insertError;
+      toast.success("Équipe mise à jour avec succès");
+    } catch (error) {
+      console.error('Error saving team data:', error);
+      toast.error("Erreur lors de la mise à jour de l'équipe");
+    }
+  };
+
   return (
-    <main className="flex-1 p-6 overflow-auto">
+    <form onSubmit={handleSubmit} className="flex-1 p-6 overflow-auto">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Gestion de l'équipe</h2>
-          <Button onClick={addTeamMember}>Ajouter un membre</Button>
+          <Button onClick={addTeamMember} type="button">Ajouter un membre</Button>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -132,6 +165,7 @@ const TeamEditor = () => {
                   size="sm"
                   className="w-full"
                   onClick={() => removeTeamMember(member.id)}
+                  type="button"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Supprimer
@@ -145,7 +179,7 @@ const TeamEditor = () => {
           Enregistrer les modifications
         </Button>
       </div>
-    </main>
+    </form>
   );
 };
 

@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { GeneralInfoSection } from "./association/GeneralInfoSection";
 import { PartnersSection } from "./association/PartnersSection";
 import { KeyPointsSection } from "./association/KeyPointsSection";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Partner {
   id: string;
@@ -88,9 +90,26 @@ const AssociationEditor = () => {
     ));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Saving data:", { associationData, partners, keyPoints });
+    try {
+      const { error } = await supabase
+        .from('association')
+        .update({
+          name: associationData.name,
+          description: associationData.longDescription,
+          logo: associationData.logoUrl,
+          partners: partners,
+          key_points: keyPoints,
+        })
+        .eq('id', '1'); // Assuming there's only one association record
+
+      if (error) throw error;
+      toast.success("Modifications enregistrées avec succès");
+    } catch (error) {
+      console.error('Error saving association data:', error);
+      toast.error("Erreur lors de l'enregistrement des modifications");
+    }
   };
 
   return (
