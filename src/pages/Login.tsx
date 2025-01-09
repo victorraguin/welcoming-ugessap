@@ -18,6 +18,9 @@ const Login = () => {
       if (event === "SIGNED_OUT") {
         setErrorMessage(""); // Clear errors on sign out
       }
+      if (event === "USER_UPDATED" && !session) {
+        setErrorMessage("Une erreur est survenue lors de la connexion.");
+      }
     });
 
     // Check if user is already logged in
