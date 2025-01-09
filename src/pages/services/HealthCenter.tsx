@@ -3,7 +3,7 @@ import { ServiceData } from "@/types/service";
 
 const healthCenterData: ServiceData = {
   id: "health-center",
-  icon: "stethoscope",
+  icon: "Stethoscope",
   title: "Centre de santé",
   description: "Notre centre de santé offre des soins de qualité et accessibles à tous, avec une équipe de professionnels dévoués à votre bien-être.",
   address: {
@@ -15,17 +15,17 @@ const healthCenterData: ServiceData = {
     {
       title: "Accessibilité",
       description: "Ouvert 6/7j, avec ou sans rendez-vous",
-      icon: "calendar"
+      icon: "Calendar"
     },
     {
       title: "Équipe qualifiée",
       description: "Médecins et spécialistes expérimentés",
-      icon: "users"
+      icon: "Users"
     },
     {
       title: "Soins complets",
       description: "De la prévention au suivi personnalisé",
-      icon: "hospital"
+      icon: "Hospital"
     }
   ],
   image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",

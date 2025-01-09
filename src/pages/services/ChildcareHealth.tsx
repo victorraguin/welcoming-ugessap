@@ -3,7 +3,7 @@ import { ServiceData } from "@/types/service";
 
 const childcareHealthData: ServiceData = {
   id: "childcare-health",
-  icon: "baby",
+  icon: "Baby",
   title: "Santé en crèche",
   description: "Un accompagnement médical personnalisé pour les tout-petits en crèche, assurant leur bien-être et leur développement.",
   address: {
@@ -15,17 +15,17 @@ const childcareHealthData: ServiceData = {
     {
       title: "Suivi régulier",
       description: "Visites hebdomadaires en crèche",
-      icon: "calendar"
+      icon: "Calendar"
     },
     {
       title: "Équipe pédiatrique",
       description: "Infirmières et pédiatres spécialisés",
-      icon: "users"
+      icon: "Users"
     },
     {
       title: "Prévention",
       description: "Dépistage et conseils santé",
-      icon: "hospital"
+      icon: "Hospital"
     }
   ],
   image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",

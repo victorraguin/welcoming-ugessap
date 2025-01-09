@@ -3,7 +3,7 @@ import { ServiceData } from "@/types/service";
 
 const medEventData: ServiceData = {
   id: "med-event",
-  icon: "ambulance",
+  icon: "Ambulance",
   title: "Med'event",
   description: "Service médical professionnel pour vos événements sportifs, culturels et festifs, garantissant la sécurité de tous les participants.",
   address: {
@@ -15,17 +15,17 @@ const medEventData: ServiceData = {
     {
       title: "Disponibilité",
       description: "Intervention 7j/7, 24h/24",
-      icon: "calendar"
+      icon: "Calendar"
     },
     {
       title: "Équipe mobile",
       description: "Personnel médical qualifié sur site",
-      icon: "users"
+      icon: "Users"
     },
     {
       title: "Équipement complet",
       description: "Matériel médical professionnel",
-      icon: "hospital"
+      icon: "Hospital"
     }
   ],
   image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
