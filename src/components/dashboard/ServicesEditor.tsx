@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, X } from "lucide-react";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import * as Icons from "lucide-react";
 
 interface Service {
@@ -135,19 +136,20 @@ const ServicesEditor = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <DashboardSidebar />
-      <div className="flex-1 overflow-auto p-8">
-        <div className="max-w-5xl mx-auto space-y-8">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold">Gestion des services</h1>
-            <Button onClick={addService}>
-              <Plus className="mr-2 h-4 w-4" /> Ajouter un service
-            </Button>
-          </div>
+    <SidebarProvider>
+      <div className="flex h-screen bg-gray-100 w-full">
+        <DashboardSidebar />
+        <div className="flex-1 overflow-auto p-8">
+          <div className="max-w-5xl mx-auto space-y-8">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold">Gestion des services</h1>
+              <Button onClick={addService}>
+                <Plus className="mr-2 h-4 w-4" /> Ajouter un service
+              </Button>
+            </div>
 
-          <div className="grid gap-8">
-            {services.map((service) => (
+            <div className="grid gap-8">
+              {services.map((service) => (
               <Card key={service.id}>
                 <CardHeader className="relative">
                   <Button
@@ -395,11 +397,12 @@ const ServicesEditor = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
