@@ -61,11 +61,11 @@ const TeamEditor = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // First, delete all existing team members
+      // First, delete all existing team members without using neq
       const { error: deleteError } = await supabase
         .from('team')
         .delete()
-        .neq('id', '0');
+        .is('id', null);  // This will match all rows since we're not using a where clause
 
       if (deleteError) throw deleteError;
 
