@@ -33,7 +33,6 @@ Que ce soit pour une consultation de routine, un suivi médical régulier ou une
       icon: "Hospital"
     }
   ],
-  image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
   images: [
     {
       url: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
