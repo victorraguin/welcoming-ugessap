@@ -10,6 +10,9 @@ import ImagesPage from "@/pages/dashboard/Images";
 import ReviewsPage from "@/pages/dashboard/Reviews";
 import Settings from "@/pages/dashboard/Settings";
 import RecruitmentPage from "@/pages/dashboard/Recruitment";
+import AssociationPage from "@/pages/dashboard/Association";
+import ServicesPage from "@/pages/dashboard/Services";
+import TeamPage from "@/pages/dashboard/Team";
 
 function App() {
   return (
@@ -22,10 +25,13 @@ function App() {
         <Route path="/services/childcare-health" element={<ChildcareHealth />} />
         <Route path="/services/med-event" element={<MedEvent />} />
         <Route path="/dashboard" element={<DashboardIndex />} />
+        <Route path="/dashboard/association" element={<AssociationPage />} />
+        <Route path="/dashboard/services" element={<ServicesPage />} />
         <Route path="/dashboard/images" element={<ImagesPage />} />
         <Route path="/dashboard/reviews" element={<ReviewsPage />} />
-        <Route path="/dashboard/settings" element={<Settings />} />
+        <Route path="/dashboard/team" element={<TeamPage />} />
         <Route path="/dashboard/recruitment" element={<RecruitmentPage />} />
+        <Route path="/dashboard/settings" element={<Settings />} />
       </Routes>
     </Router>
   );
