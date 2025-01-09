@@ -1,86 +1,100 @@
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import { Building2, Users, Briefcase, LayoutGrid, Image, MessageSquare, Settings, ArrowLeft } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Building2, Users, Briefcase, LayoutGrid, Image, MessageSquare, Settings } from "lucide-react";
+
+const menuItems = [
+  {
+    title: "Association",
+    description: "Gérer les informations de l'association",
+    icon: Building2,
+    url: "/dashboard/association",
+  },
+  {
+    title: "Services",
+    description: "Gérer les services proposés",
+    icon: LayoutGrid,
+    url: "/dashboard/services",
+  },
+  {
+    title: "Images",
+    description: "Gérer la galerie d'images",
+    icon: Image,
+    url: "/dashboard/images",
+  },
+  {
+    title: "Avis",
+    description: "Gérer les avis clients",
+    icon: MessageSquare,
+    url: "/dashboard/reviews",
+  },
+  {
+    title: "Équipe",
+    description: "Gérer l'équipe",
+    icon: Users,
+    url: "/dashboard/team",
+  },
+  {
+    title: "Recrutement",
+    description: "Gérer les offres d'emploi",
+    icon: Briefcase,
+    url: "/dashboard/recruitment",
+  },
+  {
+    title: "Contact Webmaster",
+    description: "Contacter le créateur du site",
+    icon: Settings,
+    url: "/dashboard/settings",
+  },
+];
 
 const DashboardIndex = () => {
-  const dashboardCards = [
-    {
-      title: "Association",
-      description: "Gérer les informations de l'association",
-      icon: Building2,
-      href: "/dashboard/association",
-    },
-    {
-      title: "Services",
-      description: "Gérer les services proposés",
-      icon: LayoutGrid,
-      href: "/dashboard/services",
-    },
-    {
-      title: "Images",
-      description: "Gérer les images du carousel",
-      icon: Image,
-      href: "/dashboard/images",
-    },
-    {
-      title: "Avis",
-      description: "Gérer les avis clients",
-      icon: MessageSquare,
-      href: "/dashboard/reviews",
-    },
-    {
-      title: "Équipe",
-      description: "Gérer l'équipe",
-      icon: Users,
-      href: "/dashboard/team",
-    },
-    {
-      title: "Recrutement",
-      description: "Gérer les offres d'emploi",
-      icon: Briefcase,
-      href: "/dashboard/recruitment",
-    },
-    {
-      title: "Contact Webmaster",
-      description: "Contacter le développeur",
-      icon: Settings,
-      href: "/dashboard/settings",
-    },
-  ];
-
   return (
-    <div className="min-h-screen flex">
-      <DashboardSidebar />
-      <div className="flex-1 p-8">
-        <div className="mb-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <Link to="/">
-            <Button variant="outline" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Retour au site
-            </Button>
-          </Link>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dashboardCards.map((card) => (
-            <Link key={card.href} to={card.href}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <card.icon className="h-6 w-6 text-primary" />
-                    <CardTitle>{card.title}</CardTitle>
-                  </div>
-                  <CardDescription>{card.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
-        </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <DashboardSidebar />
+        <main className="flex-1 p-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-3xl font-bold mb-8">Tableau de bord</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {menuItems.map((item) => (
+                <Link key={item.title} to={item.url}>
+                  <Card className="hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-center space-x-4">
+                        <div className="p-3 bg-primary/10 rounded-lg">
+                          <item.icon className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-semibold">{item.title}</h2>
+                          <p className="text-sm text-gray-500">{item.description}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+              <Link to="/">
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="p-3 bg-primary/10 rounded-lg">
+                        <Building2 className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold">Retour au site</h2>
+                        <p className="text-sm text-gray-500">Voir le site public</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
+          </div>
+        </main>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
