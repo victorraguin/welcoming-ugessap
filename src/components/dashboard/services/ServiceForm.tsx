@@ -9,6 +9,7 @@ import { ServiceKeyPoints } from "./ServiceKeyPoints";
 import { ServiceImages } from "./ServiceImages";
 import { ServiceButtons } from "./ServiceButtons";
 import { ServiceAddress } from "./ServiceAddress";
+import { ServiceHours } from "./ServiceHours";
 import { Service } from "@/types/service";
 
 interface ServiceFormProps {
@@ -95,6 +96,11 @@ export const ServiceForm = ({ service, onUpdate, onRemove }: ServiceFormProps) =
           <ServiceAddress
             address={service.address}
             onUpdate={(address) => onUpdate(service.id, "address", address)}
+          />
+
+          <ServiceHours
+            hours={service.hours}
+            onUpdate={(hours) => onUpdate(service.id, "hours", hours)}
           />
 
           <ServiceKeyPoints

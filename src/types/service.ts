@@ -11,6 +11,15 @@ export interface Service {
     city: string;
     postalCode: string;
   };
+  hours?: {
+    monday?: string;
+    tuesday?: string;
+    wednesday?: string;
+    thursday?: string;
+    friday?: string;
+    saturday?: string;
+    sunday?: string;
+  };
   keyPoints: Array<{
     id: string;
     icon: string;
@@ -38,6 +47,15 @@ export interface ServiceData {
     street: string;
     city: string;
     postalCode: string;
+  };
+  hours?: {
+    monday?: string;
+    tuesday?: string;
+    wednesday?: string;
+    thursday?: string;
+    friday?: string;
+    saturday?: string;
+    sunday?: string;
   };
   keyPoints: Array<{
     title: string;

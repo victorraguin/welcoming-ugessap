@@ -85,15 +85,32 @@ const ServicePage = ({ service }: ServicePageProps) => {
           </div>
         </section>
 
-        {/* Adresse Section */}
+        {/* Adresse et Horaires Section */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-8">Notre adresse</h2>
-            <div className="max-w-2xl mx-auto text-center">
-              <p className="text-lg text-gray-600">
-                {service.address.street}<br />
-                {service.address.postalCode} {service.address.city}
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold mb-8">Notre adresse</h2>
+                <p className="text-lg text-gray-600">
+                  {service.address.street}<br />
+                  {service.address.postalCode} {service.address.city}
+                </p>
+              </div>
+              
+              {service.hours && (
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold mb-8">Nos horaires</h2>
+                  <div className="space-y-2 text-lg text-gray-600">
+                    {service.hours.monday && <p>Lundi : {service.hours.monday}</p>}
+                    {service.hours.tuesday && <p>Mardi : {service.hours.tuesday}</p>}
+                    {service.hours.wednesday && <p>Mercredi : {service.hours.wednesday}</p>}
+                    {service.hours.thursday && <p>Jeudi : {service.hours.thursday}</p>}
+                    {service.hours.friday && <p>Vendredi : {service.hours.friday}</p>}
+                    {service.hours.saturday && <p>Samedi : {service.hours.saturday}</p>}
+                    {service.hours.sunday && <p>Dimanche : {service.hours.sunday}</p>}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>

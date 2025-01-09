@@ -16,6 +16,15 @@ Que ce soit pour une consultation de routine, un suivi médical régulier ou une
     city: "Paris",
     postalCode: "75001"
   },
+  hours: {
+    monday: "9h-19h",
+    tuesday: "9h-19h",
+    wednesday: "9h-19h",
+    thursday: "9h-19h",
+    friday: "9h-19h",
+    saturday: "9h-12h",
+    sunday: "Fermé"
+  },
   keyPoints: [
     {
       title: "Accessibilité",
