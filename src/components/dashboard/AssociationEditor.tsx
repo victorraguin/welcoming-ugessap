@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GeneralInfoSection } from "./association/GeneralInfoSection";
 import { PartnersSection } from "./association/PartnersSection";
@@ -49,6 +49,54 @@ const AssociationEditor = () => {
       iconName: "Building2",
     },
   ]);
+
+  useEffect(() => {
+    const fetchAssociationData = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('association')
+          .select('*')
+          .eq('id', ASSOCIATION_ID)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          setAssociationData({
+            name: data.name,
+            shortDescription: data.description || "",
+            longDescription: data.description || "",
+            logoUrl: data.logo || "/placeholder.svg",
+          });
+
+          if (data.partners) {
+            const partnersData = (data.partners as any[]).map(partner => ({
+              id: partner.id || String(Date.now()),
+              name: partner.name || "",
+              description: partner.description || "",
+              logoUrl: partner.logo_url || "/placeholder.svg",
+            }));
+            setPartners(partnersData);
+          }
+
+          if (data.key_points) {
+            const keyPointsData = (data.key_points as any[]).map(point => ({
+              id: point.id || String(Date.now()),
+              title: point.title || "",
+              description: point.description || "",
+              iconName: point.icon_name || "Building2",
+            }));
+            setKeyPoints(keyPointsData);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching association data:', error);
+        toast.error("Erreur lors du chargement des données");
+      }
+    };
+
+    fetchAssociationData();
+  }, []);
 
   const handleGeneralInfoUpdate = (field: string, value: string) => {
     setAssociationData((prev) => ({ ...prev, [field]: value }));
