@@ -9,7 +9,246 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      association: {
+        Row: {
+          description: string | null
+          id: string
+          is_open_for_recruitment: boolean | null
+          key_points: Json
+          logo: string | null
+          name: string
+          partners: Json
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          is_open_for_recruitment?: boolean | null
+          key_points?: Json
+          logo?: string | null
+          name: string
+          partners?: Json
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          is_open_for_recruitment?: boolean | null
+          key_points?: Json
+          logo?: string | null
+          name?: string
+          partners?: Json
+        }
+        Relationships: []
+      }
+      association_jobs: {
+        Row: {
+          association_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          image: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          association_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          association_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "association_jobs_association_id_fkey"
+            columns: ["association_id"]
+            isOneToOne: false
+            referencedRelation: "association"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      avis: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          review_date: string
+          stars: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          review_date: string
+          stars?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          review_date?: string
+          stars?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      images: {
+        Row: {
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
+      service_buttons: {
+        Row: {
+          created_at: string | null
+          id: string
+          label: string
+          order_index: number | null
+          service_id: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          label: string
+          order_index?: number | null
+          service_id: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          label?: string
+          order_index?: number | null
+          service_id?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_buttons_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          description: string | null
+          icon_name: string | null
+          id: string
+          image: string | null
+          key_points: Json
+          order_index: number | null
+          schedule: Json
+          short_description: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          image?: string | null
+          key_points?: Json
+          order_index?: number | null
+          schedule?: Json
+          short_description?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          image?: string | null
+          key_points?: Json
+          order_index?: number | null
+          schedule?: Json
+          short_description?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      team: {
+        Row: {
+          created_at: string | null
+          id: string
+          image: string | null
+          job_title: string | null
+          person_name: string
+          service_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image?: string | null
+          job_title?: string | null
+          person_name: string
+          service_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image?: string | null
+          job_title?: string | null
+          person_name?: string
+          service_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
