@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Building2, Home, Settings, Users, Briefcase, LayoutGrid, Image, MessageSquare } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
   {
@@ -55,23 +55,35 @@ const menuItems = [
 ];
 
 const DashboardSidebar = () => {
+  const location = useLocation();
+
   return (
-    <Sidebar>
+    <Sidebar className="border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Administration</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-lg font-semibold px-4 py-2">
+            Administration
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuItems.map((item) => {
+                const isActive = location.pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className={`hover:bg-accent hover:text-accent-foreground ${
+                        isActive ? "bg-accent/50 font-semibold border-b-2 border-primary" : ""
+                      }`}
+                    >
+                      <Link to={item.url} className="flex items-center gap-3 px-4 py-2">
+                        <item.icon className={`h-5 w-5 ${isActive ? "text-primary" : ""}`} />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
