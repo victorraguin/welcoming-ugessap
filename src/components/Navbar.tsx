@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,10 +22,15 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const services = [
+    { name: "Centre de santé", path: "/services#sante" },
+    { name: "Santé en crèche", path: "/services#creche" },
+    { name: "Med'event", path: "/services#event" },
+  ];
+
   const navLinks = [
     { name: "Accueil", path: "/" },
     { name: "L'association", path: "/association" },
-    { name: "Nos services", path: "/services" },
     { name: "Contact", path: "/contact" },
   ];
 
@@ -50,6 +61,28 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-1">
+                  Nos services
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {services.map((service) => (
+                  <DropdownMenuItem key={service.path}>
+                    <Link
+                      to={service.path}
+                      className="w-full"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {service.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile Navigation Button */}
@@ -85,6 +118,19 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
+              <div className="pt-4 border-t">
+                <p className="text-sm font-semibold text-gray-500 mb-3">Nos services</p>
+                {services.map((service) => (
+                  <Link
+                    key={service.path}
+                    to={service.path}
+                    onClick={() => setIsOpen(false)}
+                    className="block py-2 text-foreground/80 hover:text-primary"
+                  >
+                    {service.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>

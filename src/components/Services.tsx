@@ -1,29 +1,42 @@
-import { Heart, Baby, Building2 } from "lucide-react";
+import { Heart, Baby, Building2, ArrowRight, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const services = [
   {
     icon: Heart,
     title: "Centre de santé",
     description: "Des soins de proximité avec des professionnels qualifiés",
+    action: {
+      label: "Prendre rendez-vous",
+      onClick: () => toast.success("Redirection vers la prise de rendez-vous")
+    }
   },
   {
     icon: Baby,
     title: "Santé en crèche",
     description: "Suivi médical des enfants avec des infirmières et pédiatres",
+    action: {
+      label: "Contacter le service",
+      onClick: () => toast.success("Redirection vers le formulaire de contact")
+    }
   },
   {
     icon: Building2,
     title: "Med'event",
     description: "Prise en charge médicale lors d'événements",
+    action: {
+      label: "Demander un devis",
+      onClick: () => toast.success("Redirection vers le formulaire de devis")
+    }
   },
 ];
 
 const Services = () => {
   return (
-    <section className="py-16 bg-white">
+    <section id="services" className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-12">Nos Services</h2>
         
@@ -38,8 +51,13 @@ const Services = () => {
               </CardHeader>
               <CardContent className="text-center">
                 <p className="text-gray-600 mb-6">{service.description}</p>
-                <Button variant="ghost" className="text-primary hover:text-primary/80">
-                  En savoir plus <ArrowRight className="ml-2 h-4 w-4" />
+                <Button 
+                  variant="secondary"
+                  className="w-full"
+                  onClick={service.action.onClick}
+                >
+                  {service.action.label}
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardContent>
             </Card>
