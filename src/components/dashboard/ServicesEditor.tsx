@@ -50,7 +50,7 @@ const ServicesEditor = () => {
           .upsert({
             id: service.id,
             title: service.title,
-            description: service.description,
+            description: service.longDescription,
             short_description: service.shortDescription,
             icon_name: service.icon,
             key_points: service.keyPoints,
