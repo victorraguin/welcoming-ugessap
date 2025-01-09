@@ -5,6 +5,7 @@ import { ServiceForm } from "./services/ServiceForm";
 import { Service } from "@/types/service";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { transformServiceFromDb } from "@/utils/serviceTransformers";
 
 const ServicesEditor = () => {
   const [services, setServices] = useState<Service[]>([]);
@@ -26,23 +27,7 @@ const ServicesEditor = () => {
 
       if (error) throw error;
 
-      const formattedServices = data.map(service => ({
-        id: service.id,
-        icon: service.icon_name || "LayoutGrid",
-        title: service.title,
-        shortDescription: service.short_description || "",
-        longDescription: service.description || "",
-        address: service.address ? JSON.parse(service.address) : undefined,
-        hours: service.schedule || {},
-        keyPoints: service.key_points || [],
-        images: service.image ? [{ id: crypto.randomUUID(), url: service.image, alt: service.title }] : [],
-        buttons: service.service_buttons.map(button => ({
-          id: button.id,
-          text: button.label,
-          link: button.url
-        }))
-      }));
-
+      const formattedServices = data.map(transformServiceFromDb);
       setServices(formattedServices);
     } catch (error) {
       console.error("Error fetching services:", error);
@@ -60,24 +45,22 @@ const ServicesEditor = () => {
           title: "Nouveau service",
           icon_name: "LayoutGrid",
           key_points: [],
-          schedule: {}
+          schedule: {
+            lundi: null,
+            mardi: null,
+            mercredi: null,
+            jeudi: null,
+            vendredi: null,
+            samedi: null,
+            dimanche: null
+          }
         })
-        .select()
+        .select(`*, service_buttons(*)`)
         .single();
 
       if (error) throw error;
 
-      const formattedService: Service = {
-        id: newService.id,
-        icon: "LayoutGrid",
-        title: "Nouveau service",
-        shortDescription: "",
-        longDescription: "",
-        keyPoints: [],
-        images: [],
-        buttons: [],
-      };
-
+      const formattedService = transformServiceFromDb(newService);
       setServices([...services, formattedService]);
       toast.success("Service créé avec succès");
     } catch (error) {
@@ -133,7 +116,15 @@ const ServicesEditor = () => {
           updateData.address = JSON.stringify(value);
           break;
         case "hours":
-          updateData.schedule = value;
+          updateData.schedule = {
+            lundi: value.monday,
+            mardi: value.tuesday,
+            mercredi: value.wednesday,
+            jeudi: value.thursday,
+            vendredi: value.friday,
+            samedi: value.saturday,
+            dimanche: value.sunday
+          };
           break;
         case "keyPoints":
           updateData.key_points = value;
