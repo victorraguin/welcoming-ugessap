@@ -5,8 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 
 interface TeamMember {
   id: string;
@@ -58,101 +56,96 @@ const TeamEditor = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <DashboardSidebar />
-        <main className="flex-1 p-6 bg-gray-50">
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Gestion de l'équipe</h2>
-              <Button onClick={addTeamMember}>Ajouter un membre</Button>
-            </div>
+    <main className="flex-1 p-6 overflow-auto">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Gestion de l'équipe</h2>
+          <Button onClick={addTeamMember}>Ajouter un membre</Button>
+        </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {teamMembers.map((member) => (
-                <Card key={member.id}>
-                  <CardContent className="pt-6 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor={`photo-${member.id}`}>Photo</Label>
-                      <Input
-                        id={`photo-${member.id}`}
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            // Handle file upload here
-                            console.log("File selected:", file);
-                          }
-                        }}
-                      />
-                      {member.photoUrl && (
-                        <img
-                          src={member.photoUrl}
-                          alt={member.name}
-                          className="w-32 h-32 object-cover rounded-lg mx-auto"
-                        />
-                      )}
-                    </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {teamMembers.map((member) => (
+            <Card key={member.id}>
+              <CardContent className="pt-6 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor={`photo-${member.id}`}>Photo</Label>
+                  <Input
+                    id={`photo-${member.id}`}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        // Handle file upload here
+                        console.log("File selected:", file);
+                      }
+                    }}
+                  />
+                  {member.photoUrl && (
+                    <img
+                      src={member.photoUrl}
+                      alt={member.name}
+                      className="w-32 h-32 object-cover rounded-lg mx-auto"
+                    />
+                  )}
+                </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor={`name-${member.id}`}>Nom</Label>
-                      <Input
-                        id={`name-${member.id}`}
-                        value={member.name}
-                        onChange={(e) => updateTeamMember(member.id, "name", e.target.value)}
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`name-${member.id}`}>Nom</Label>
+                  <Input
+                    id={`name-${member.id}`}
+                    value={member.name}
+                    onChange={(e) => updateTeamMember(member.id, "name", e.target.value)}
+                  />
+                </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor={`role-${member.id}`}>Fonction</Label>
-                      <Input
-                        id={`role-${member.id}`}
-                        value={member.role}
-                        onChange={(e) => updateTeamMember(member.id, "role", e.target.value)}
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`role-${member.id}`}>Fonction</Label>
+                  <Input
+                    id={`role-${member.id}`}
+                    value={member.role}
+                    onChange={(e) => updateTeamMember(member.id, "role", e.target.value)}
+                  />
+                </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor={`service-${member.id}`}>Service</Label>
-                      <Select
-                        value={member.service}
-                        onValueChange={(value) => updateTeamMember(member.id, "service", value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {services.map((service) => (
-                            <SelectItem key={service} value={service}>
-                              {service}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`service-${member.id}`}>Service</Label>
+                  <Select
+                    value={member.service}
+                    onValueChange={(value) => updateTeamMember(member.id, "service", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {services.map((service) => (
+                        <SelectItem key={service} value={service}>
+                          {service}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => removeTeamMember(member.id)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Supprimer
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => removeTeamMember(member.id)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Supprimer
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-            <Button type="submit" className="w-full">
-              Enregistrer les modifications
-            </Button>
-          </div>
-        </main>
+        <Button type="submit" className="w-full">
+          Enregistrer les modifications
+        </Button>
       </div>
-    </SidebarProvider>
+    </main>
   );
 };
 
