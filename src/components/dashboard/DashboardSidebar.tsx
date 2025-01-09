@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Building2, Home, Settings, Users, Briefcase } from "lucide-react";
+import { Building2, Home, Settings, Users, Briefcase, LayoutGrid } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const menuItems = [
@@ -21,6 +21,11 @@ const menuItems = [
     title: "Association",
     url: "/dashboard/association",
     icon: Building2,
+  },
+  {
+    title: "Services",
+    url: "/dashboard/services",
+    icon: LayoutGrid,
   },
   {
     title: "Équipe",

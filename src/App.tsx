@@ -8,6 +8,7 @@ import MedEvent from "./pages/services/MedEvent";
 import DashboardPage from "./pages/dashboard/Index";
 import TeamEditor from "./components/dashboard/TeamEditor";
 import RecruitmentEditor from "./components/dashboard/RecruitmentEditor";
+import ServicesEditor from "./components/dashboard/ServicesEditor";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboard/team" element={<TeamEditor />} />
         <Route path="/dashboard/recruitment" element={<RecruitmentEditor />} />
+        <Route path="/dashboard/services" element={<ServicesEditor />} />
       </Routes>
     </Router>
   );
