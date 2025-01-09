@@ -22,6 +22,8 @@ interface KeyPoint {
   iconName: string;
 }
 
+const ASSOCIATION_ID = "d129aa9c-c316-4cea-b3dc-45699cac3be5"; // Using a proper UUID
+
 const AssociationEditor = () => {
   const [associationData, setAssociationData] = useState({
     name: "UGESSAP",
@@ -115,7 +117,7 @@ const AssociationEditor = () => {
           partners: partnersJson,
           key_points: keyPointsJson,
         })
-        .eq('id', '1');
+        .eq('id', ASSOCIATION_ID);
 
       if (error) throw error;
       toast.success("Modifications enregistrées avec succès");
