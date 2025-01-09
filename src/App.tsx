@@ -9,6 +9,7 @@ import DashboardIndex from "@/pages/dashboard/Index";
 import ImagesPage from "@/pages/dashboard/Images";
 import ReviewsPage from "@/pages/dashboard/Reviews";
 import Settings from "@/pages/dashboard/Settings";
+import RecruitmentPage from "@/pages/dashboard/Recruitment";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/dashboard/images" element={<ImagesPage />} />
         <Route path="/dashboard/reviews" element={<ReviewsPage />} />
         <Route path="/dashboard/settings" element={<Settings />} />
+        <Route path="/dashboard/recruitment" element={<RecruitmentPage />} />
       </Routes>
     </Router>
   );
