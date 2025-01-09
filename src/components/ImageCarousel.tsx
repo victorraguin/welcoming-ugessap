@@ -8,10 +8,20 @@ import {
 import { useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
+// Placeholder images until we implement state management
 const images = [
-  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-  "https://images.unsplash.com/photo-1605810230434-7631ac76ec81",
-  "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+  {
+    url: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+    alt: "Image 1",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81",
+    alt: "Image 2",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+    alt: "Image 3",
+  },
 ];
 
 const ImageCarousel = () => {
@@ -41,8 +51,8 @@ const ImageCarousel = () => {
               <CarouselItem key={index}>
                 <div className="aspect-video w-full overflow-hidden rounded-lg">
                   <img
-                    src={image}
-                    alt={`Slide ${index + 1}`}
+                    src={image.url}
+                    alt={image.alt}
                     className="w-full h-full object-cover"
                   />
                 </div>
