@@ -5,6 +5,7 @@ import { PartnersSection } from "./association/PartnersSection";
 import { KeyPointsSection } from "./association/KeyPointsSection";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Json } from "@/integrations/supabase/types";
 
 interface Partner {
   id: string;
@@ -93,14 +94,25 @@ const AssociationEditor = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Transform partners and keyPoints to match the Json type
+      const partnersJson = partners.map(partner => ({
+        ...partner,
+        logo_url: partner.logoUrl // Transform to match database convention
+      })) as Json[];
+
+      const keyPointsJson = keyPoints.map(point => ({
+        ...point,
+        icon_name: point.iconName // Transform to match database convention
+      })) as Json[];
+
       const { error } = await supabase
         .from('association')
         .update({
           name: associationData.name,
           description: associationData.longDescription,
           logo: associationData.logoUrl,
-          partners: partners,
-          key_points: keyPoints,
+          partners: partnersJson,
+          key_points: keyPointsJson,
         })
         .eq('id', '1'); // Assuming there's only one association record
 
