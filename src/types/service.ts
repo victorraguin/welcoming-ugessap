@@ -12,17 +12,24 @@ export type KeyPoint = {
   icon: keyof typeof icons;
 };
 
+export type ServiceImage = {
+  url: string;
+  alt: string;
+  description: string;
+};
+
 export type ServiceData = {
   id: string;
   icon: keyof typeof icons;
   title: string;
   description: string;
+  mission: string;
   address: {
     street: string;
     city: string;
     postalCode: string;
   };
   keyPoints: KeyPoint[];
-  image: string;
+  images: ServiceImage[];
   actions: ServiceAction[];
 };
