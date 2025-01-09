@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { JobPostingForm } from "./recruitment/JobPostingForm";
 import { RecruitmentModeToggle } from "./recruitment/RecruitmentModeToggle";
 
-const ASSOCIATION_ID = "d129aa9c-c316-4cea-b3dc-45699cac3be5"; // Using the same UUID as AssociationEditor
+const ASSOCIATION_ID = "d129aa9c-c316-4cea-b3dc-45699cac3be5";
 
 interface JobPosting {
   id: string;
@@ -18,14 +18,49 @@ interface JobPosting {
 
 const RecruitmentEditor = () => {
   const [isRecruiting, setIsRecruiting] = useState(false);
-  const [jobPostings, setJobPostings] = useState<JobPosting[]>([
-    {
-      id: "1",
-      title: "Médecin généraliste",
-      description: "Nous recherchons un médecin généraliste pour notre centre de santé.",
-      imageUrl: "/placeholder.svg",
-    },
-  ]);
+  const [jobPostings, setJobPostings] = useState<JobPosting[]>([]);
+
+  useEffect(() => {
+    const fetchRecruitmentData = async () => {
+      try {
+        // Fetch association recruitment status
+        const { data: associationData, error: associationError } = await supabase
+          .from('association')
+          .select('is_open_for_recruitment')
+          .eq('id', ASSOCIATION_ID)
+          .single();
+
+        if (associationError) throw associationError;
+        
+        if (associationData) {
+          setIsRecruiting(associationData.is_open_for_recruitment || false);
+        }
+
+        // Fetch job postings
+        const { data: jobsData, error: jobsError } = await supabase
+          .from('association_jobs')
+          .select('*')
+          .eq('association_id', ASSOCIATION_ID);
+
+        if (jobsError) throw jobsError;
+
+        if (jobsData) {
+          const formattedJobs = jobsData.map(job => ({
+            id: job.id,
+            title: job.title,
+            description: job.description || "",
+            imageUrl: job.image || "/placeholder.svg",
+          }));
+          setJobPostings(formattedJobs);
+        }
+      } catch (error) {
+        console.error('Error fetching recruitment data:', error);
+        toast.error("Erreur lors du chargement des données");
+      }
+    };
+
+    fetchRecruitmentData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
