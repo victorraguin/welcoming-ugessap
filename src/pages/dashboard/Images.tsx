@@ -41,11 +41,11 @@ const ImagesPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // First, delete existing images
+      // First, delete all existing images
       const { error: deleteError } = await supabase
         .from('images')
         .delete()
-        .neq('id', '0');
+        .not('id', 'is', null); // This will match all rows
 
       if (deleteError) throw deleteError;
 
