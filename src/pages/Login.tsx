@@ -61,7 +61,7 @@ const Login = () => {
                 sign_up: {
                   email_label: 'Adresse email',
                   password_label: 'Mot de passe',
-                  button_label: 'S'inscrire',
+                  button_label: "S'inscrire",
                   loading_button_label: 'Inscription en cours...',
                 },
               },
