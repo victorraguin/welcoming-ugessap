@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { Trash2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { JobPostingForm } from "./recruitment/JobPostingForm";
+import { RecruitmentModeToggle } from "./recruitment/RecruitmentModeToggle";
+
+const ASSOCIATION_ID = "d129aa9c-c316-4cea-b3dc-45699cac3be5"; // Using the same UUID as AssociationEditor
 
 interface JobPosting {
   id: string;
@@ -35,7 +34,7 @@ const RecruitmentEditor = () => {
       const { error: recruitmentError } = await supabase
         .from('association')
         .update({ is_open_for_recruitment: isRecruiting })
-        .eq('id', '1');
+        .eq('id', ASSOCIATION_ID);
 
       if (recruitmentError) throw recruitmentError;
 
@@ -43,7 +42,7 @@ const RecruitmentEditor = () => {
       const { error: deleteError } = await supabase
         .from('association_jobs')
         .delete()
-        .neq('id', '0');
+        .eq('association_id', ASSOCIATION_ID);
 
       if (deleteError) throw deleteError;
 
@@ -53,7 +52,7 @@ const RecruitmentEditor = () => {
           .from('association_jobs')
           .insert(
             jobPostings.map(job => ({
-              association_id: '1',
+              association_id: ASSOCIATION_ID,
               title: job.title,
               description: job.description,
               image: job.imageUrl
@@ -100,20 +99,10 @@ const RecruitmentEditor = () => {
             <h2 className="text-2xl font-bold">Gestion du recrutement</h2>
           </div>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="recruitment-mode"
-                  checked={isRecruiting}
-                  onCheckedChange={setIsRecruiting}
-                />
-                <Label htmlFor="recruitment-mode">
-                  Mode recrutement {isRecruiting ? "activé" : "désactivé"}
-                </Label>
-              </div>
-            </CardContent>
-          </Card>
+          <RecruitmentModeToggle
+            isRecruiting={isRecruiting}
+            onToggle={setIsRecruiting}
+          />
 
           {isRecruiting && (
             <>
@@ -127,62 +116,12 @@ const RecruitmentEditor = () => {
 
               <div className="grid gap-6 md:grid-cols-2">
                 {jobPostings.map((posting) => (
-                  <Card key={posting.id}>
-                    <CardContent className="pt-6 space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor={`image-${posting.id}`}>Image</Label>
-                        <Input
-                          id={`image-${posting.id}`}
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              // Handle file upload here
-                              console.log("File selected:", file);
-                            }
-                          }}
-                        />
-                        {posting.imageUrl && (
-                          <img
-                            src={posting.imageUrl}
-                            alt={posting.title}
-                            className="w-full h-48 object-cover rounded-lg"
-                          />
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor={`title-${posting.id}`}>Titre du poste</Label>
-                        <Input
-                          id={`title-${posting.id}`}
-                          value={posting.title}
-                          onChange={(e) => updateJobPosting(posting.id, "title", e.target.value)}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor={`description-${posting.id}`}>Description</Label>
-                        <Textarea
-                          id={`description-${posting.id}`}
-                          value={posting.description}
-                          onChange={(e) => updateJobPosting(posting.id, "description", e.target.value)}
-                          rows={4}
-                        />
-                      </div>
-
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => removeJobPosting(posting.id)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Supprimer
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <JobPostingForm
+                    key={posting.id}
+                    posting={posting}
+                    onUpdate={updateJobPosting}
+                    onRemove={removeJobPosting}
+                  />
                 ))}
               </div>
             </>
