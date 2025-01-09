@@ -5,6 +5,7 @@ import Contact from "./pages/Contact";
 import HealthCenter from "./pages/services/HealthCenter";
 import ChildcareHealth from "./pages/services/ChildcareHealth";
 import MedEvent from "./pages/services/MedEvent";
+import DashboardPage from "./pages/dashboard/Index";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/services/centre-de-sante" element={<HealthCenter />} />
         <Route path="/services/sante-en-creche" element={<ChildcareHealth />} />
         <Route path="/services/med-event" element={<MedEvent />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
     </Router>
   );
