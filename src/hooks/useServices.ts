@@ -10,6 +10,11 @@ export const useServices = () => {
 
   const fetchServices = async () => {
     try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error("Not authenticated");
+      }
+
       const { data, error } = await supabase
         .from("services")
         .select(`
@@ -32,6 +37,11 @@ export const useServices = () => {
 
   const addService = async () => {
     try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error("Not authenticated");
+      }
+
       const { data: newService, error } = await supabase
         .from("services")
         .insert({
