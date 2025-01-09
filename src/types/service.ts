@@ -1,3 +1,5 @@
+import { icons } from "lucide-react";
+
 export type ServiceAction = {
   label: string;
   onClick: () => void;
@@ -7,12 +9,12 @@ export type ServiceAction = {
 export type KeyPoint = {
   title: string;
   description: string;
-  icon: string;
+  icon: keyof typeof icons;
 };
 
 export type ServiceData = {
   id: string;
-  icon: string;
+  icon: keyof typeof icons;
   title: string;
   description: string;
   address: {
