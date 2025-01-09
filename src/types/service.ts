@@ -1,35 +1,29 @@
 import { icons } from "lucide-react";
 
-export type ServiceAction = {
-  label: string;
-  onClick: () => void;
-  variant?: "default" | "secondary" | "outline";
-};
-
-export type KeyPoint = {
-  title: string;
-  description: string;
-  icon: keyof typeof icons;
-};
-
-export type ServiceImage = {
-  url: string;
-  alt: string;
-  description: string;
-};
-
-export type ServiceData = {
+export interface Service {
   id: string;
-  icon: keyof typeof icons;
+  icon: string;
   title: string;
-  description: string;
-  mission: string;
-  address: {
+  shortDescription: string;
+  longDescription: string;
+  address?: {
     street: string;
     city: string;
     postalCode: string;
   };
-  keyPoints: KeyPoint[];
-  images: ServiceImage[];
-  actions: ServiceAction[];
-};
+  keyPoints: Array<{
+    id: string;
+    icon: string;
+    text: string;
+  }>;
+  images: Array<{
+    id: string;
+    url: string;
+    alt: string;
+  }>;
+  buttons: Array<{
+    id: string;
+    text: string;
+    link: string;
+  }>;
+}
