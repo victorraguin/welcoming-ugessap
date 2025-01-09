@@ -45,11 +45,11 @@ const ReviewsPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // First, delete existing reviews
+      // First, delete all existing reviews without using neq
       const { error: deleteError } = await supabase
         .from('avis')
         .delete()
-        .neq('id', '0');
+        .is('id', 'is not', null); // This will match all rows
 
       if (deleteError) throw deleteError;
 
