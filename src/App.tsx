@@ -14,6 +14,7 @@ import RecruitmentPage from "@/pages/dashboard/Recruitment";
 import AssociationPage from "@/pages/dashboard/Association";
 import ServicesPage from "@/pages/dashboard/Services";
 import TeamPage from "@/pages/dashboard/Team";
+import Login from "@/pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/services/health-center" element={<HealthCenter />} />
           <Route path="/services/childcare-health" element={<ChildcareHealth />} />
           <Route path="/services/med-event" element={<MedEvent />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<DashboardIndex />} />
           <Route path="/dashboard/association" element={<AssociationPage />} />
           <Route path="/dashboard/services" element={<ServicesPage />} />
