@@ -1,8 +1,6 @@
 import { useState } from "react";
-import DashboardSidebar from "./DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { ServiceForm } from "./services/ServiceForm";
 import { Service } from "@/types/service";
 
@@ -24,7 +22,7 @@ const ServicesEditor = () => {
   };
 
   const removeService = (id: string) => {
-    setImages(services.filter((service) => service.id !== id));
+    setServices(services.filter((service) => service.id !== id));
   };
 
   const updateService = (id: string, field: keyof Service, value: any) => {
