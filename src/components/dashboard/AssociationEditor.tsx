@@ -5,6 +5,7 @@ import { PartnersSection } from "./association/PartnersSection";
 import { KeyPointsSection } from "./association/KeyPointsSection";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { Json } from "@/integrations/supabase/types";
 
 interface Partner {
@@ -97,12 +98,12 @@ const AssociationEditor = () => {
       // Transform partners and keyPoints to match the Json type
       const partnersJson = partners.map(partner => ({
         ...partner,
-        logo_url: partner.logoUrl // Transform to match database convention
+        logo_url: partner.logoUrl
       })) as Json[];
 
       const keyPointsJson = keyPoints.map(point => ({
         ...point,
-        icon_name: point.iconName // Transform to match database convention
+        icon_name: point.iconName
       })) as Json[];
 
       const { error } = await supabase
@@ -114,7 +115,7 @@ const AssociationEditor = () => {
           partners: partnersJson,
           key_points: keyPointsJson,
         })
-        .eq('id', '1'); // Assuming there's only one association record
+        .eq('id', '1');
 
       if (error) throw error;
       toast.success("Modifications enregistrées avec succès");
@@ -125,27 +126,30 @@ const AssociationEditor = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <GeneralInfoSection
-        {...associationData}
-        onUpdate={handleGeneralInfoUpdate}
-      />
-      <PartnersSection
-        partners={partners}
-        onAddPartner={addPartner}
-        onRemovePartner={removePartner}
-        onUpdatePartner={updatePartner}
-      />
-      <KeyPointsSection
-        keyPoints={keyPoints}
-        onAddKeyPoint={addKeyPoint}
-        onRemoveKeyPoint={removeKeyPoint}
-        onUpdateKeyPoint={updateKeyPoint}
-      />
-      <Button type="submit" className="w-full">
-        Enregistrer les modifications
-      </Button>
-    </form>
+    <>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <GeneralInfoSection
+          {...associationData}
+          onUpdate={handleGeneralInfoUpdate}
+        />
+        <PartnersSection
+          partners={partners}
+          onAddPartner={addPartner}
+          onRemovePartner={removePartner}
+          onUpdatePartner={updatePartner}
+        />
+        <KeyPointsSection
+          keyPoints={keyPoints}
+          onAddKeyPoint={addKeyPoint}
+          onRemoveKeyPoint={removeKeyPoint}
+          onUpdateKeyPoint={updateKeyPoint}
+        />
+        <Button type="submit" className="w-full">
+          Enregistrer les modifications
+        </Button>
+      </form>
+      <Toaster />
+    </>
   );
 };
 

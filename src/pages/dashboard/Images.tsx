@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ImageForm } from "@/components/dashboard/images/ImageForm";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 interface CarouselImage {
   id: string;
@@ -35,6 +38,37 @@ const ImagesPage = () => {
     );
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // First, delete existing images
+      const { error: deleteError } = await supabase
+        .from('images')
+        .delete()
+        .neq('id', '0');
+
+      if (deleteError) throw deleteError;
+
+      // Then insert new images
+      if (images.length > 0) {
+        const { error: insertError } = await supabase
+          .from('images')
+          .insert(
+            images.map(image => ({
+              url: image.url,
+            }))
+          );
+
+        if (insertError) throw insertError;
+      }
+
+      toast.success("Images enregistrées avec succès");
+    } catch (error) {
+      console.error('Error saving images:', error);
+      toast.error("Erreur lors de l'enregistrement des images");
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen bg-gray-100 w-full">
@@ -48,18 +82,25 @@ const ImagesPage = () => {
               </Button>
             </div>
 
-            <div className="grid gap-4">
-              {images.map((image) => (
-                <ImageForm
-                  key={image.id}
-                  image={image}
-                  onUpdate={updateImage}
-                  onRemove={removeImage}
-                />
-              ))}
-            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-4">
+                {images.map((image) => (
+                  <ImageForm
+                    key={image.id}
+                    image={image}
+                    onUpdate={updateImage}
+                    onRemove={removeImage}
+                  />
+                ))}
+              </div>
+
+              <Button type="submit" className="w-full mt-4">
+                Enregistrer les modifications
+              </Button>
+            </form>
           </div>
         </div>
+        <Toaster />
       </div>
     </SidebarProvider>
   );

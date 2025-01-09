@@ -4,6 +4,9 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ReviewForm } from "@/components/dashboard/reviews/ReviewForm";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 interface Review {
   id: string;
@@ -39,6 +42,40 @@ const ReviewsPage = () => {
     );
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // First, delete existing reviews
+      const { error: deleteError } = await supabase
+        .from('avis')
+        .delete()
+        .neq('id', '0');
+
+      if (deleteError) throw deleteError;
+
+      // Then insert new reviews
+      if (reviews.length > 0) {
+        const { error: insertError } = await supabase
+          .from('avis')
+          .insert(
+            reviews.map(review => ({
+              title: review.title,
+              review_date: review.date,
+              stars: review.stars,
+              description: review.description,
+            }))
+          );
+
+        if (insertError) throw insertError;
+      }
+
+      toast.success("Avis enregistrés avec succès");
+    } catch (error) {
+      console.error('Error saving reviews:', error);
+      toast.error("Erreur lors de l'enregistrement des avis");
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen bg-gray-100 w-full">
@@ -52,18 +89,25 @@ const ReviewsPage = () => {
               </Button>
             </div>
 
-            <div className="grid gap-4">
-              {reviews.map((review) => (
-                <ReviewForm
-                  key={review.id}
-                  review={review}
-                  onUpdate={updateReview}
-                  onRemove={removeReview}
-                />
-              ))}
-            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-4">
+                {reviews.map((review) => (
+                  <ReviewForm
+                    key={review.id}
+                    review={review}
+                    onUpdate={updateReview}
+                    onRemove={removeReview}
+                  />
+                ))}
+              </div>
+
+              <Button type="submit" className="w-full mt-4">
+                Enregistrer les modifications
+              </Button>
+            </form>
           </div>
         </div>
+        <Toaster />
       </div>
     </SidebarProvider>
   );

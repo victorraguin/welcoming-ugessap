@@ -7,6 +7,7 @@ import { Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 interface TeamMember {
   id: string;
@@ -64,7 +65,7 @@ const TeamEditor = () => {
       const { error: deleteError } = await supabase
         .from('team')
         .delete()
-        .neq('id', '0'); // Delete all records
+        .neq('id', '0');
 
       if (deleteError) throw deleteError;
 
@@ -89,7 +90,8 @@ const TeamEditor = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex-1 p-6 overflow-auto">
+    <>
+      <form onSubmit={handleSubmit} className="flex-1 p-6 overflow-auto">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Gestion de l'équipe</h2>
@@ -179,7 +181,9 @@ const TeamEditor = () => {
           Enregistrer les modifications
         </Button>
       </div>
-    </form>
+      </form>
+      <Toaster />
+    </>
   );
 };
 
