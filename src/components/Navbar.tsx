@@ -3,21 +3,31 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+
+  const { data: services, isLoading } = useQuery({
+    queryKey: ['services'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('services')
+        .select('id, title')
+        .order('order_index', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    }
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,12 +36,6 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const services = [
-    { name: "Centre de santé", path: "/services/health-center" },
-    { name: "Santé en crèche", path: "/services/childcare-health" },
-    { name: "Med'event", path: "/services/med-event" },
-  ];
 
   const navLinks = [
     { name: "Accueil", path: "/" },
@@ -79,16 +83,22 @@ const Navbar = () => {
               </HoverCardTrigger>
               <HoverCardContent className="w-48">
                 <div className="flex flex-col space-y-2">
-                  {services.map((service) => (
-                    <Link
-                      key={service.path}
-                      to={service.path}
-                      className="text-sm hover:text-primary transition-colors px-2 py-1 rounded-md hover:bg-accent"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {service.name}
-                    </Link>
-                  ))}
+                  {isLoading ? (
+                    [...Array(3)].map((_, index) => (
+                      <Skeleton key={index} className="h-8 w-full" />
+                    ))
+                  ) : (
+                    services?.map((service) => (
+                      <Link
+                        key={service.id}
+                        to={`/services/${service.id}`}
+                        className="text-sm hover:text-primary transition-colors px-2 py-1 rounded-md hover:bg-accent"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {service.title}
+                      </Link>
+                    ))
+                  )}
                 </div>
               </HoverCardContent>
             </HoverCard>
@@ -142,16 +152,22 @@ const Navbar = () => {
               </Link>
               <div className="pt-4 border-t">
                 <p className="text-sm font-semibold text-gray-500 mb-3">Nos services</p>
-                {services.map((service) => (
-                  <Link
-                    key={service.path}
-                    to={service.path}
-                    onClick={() => setIsOpen(false)}
-                    className="block py-2 text-foreground/80 hover:text-primary"
-                  >
-                    {service.name}
-                  </Link>
-                ))}
+                {isLoading ? (
+                  [...Array(3)].map((_, index) => (
+                    <Skeleton key={index} className="h-8 w-full mb-2" />
+                  ))
+                ) : (
+                  services?.map((service) => (
+                    <Link
+                      key={service.id}
+                      to={`/services/${service.id}`}
+                      onClick={() => setIsOpen(false)}
+                      className="block py-2 text-foreground/80 hover:text-primary"
+                    >
+                      {service.title}
+                    </Link>
+                  ))
+                )}
               </div>
               <Link
                 to="/contact"
