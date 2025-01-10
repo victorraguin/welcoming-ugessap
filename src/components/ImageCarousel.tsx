@@ -3,68 +3,83 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { useEffect } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+  CarouselPrevious
+} from '@/components/ui/carousel'
+import { useEffect, useState } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
+import { supabase } from '@/integrations/supabase/client'
 
-// Placeholder images until we implement state management
-const images = [
-  {
-    url: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-    alt: "Image 1",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81",
-    alt: "Image 2",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
-    alt: "Image 3",
-  },
-];
+interface Image {
+  id: string
+  url: string
+}
 
 const ImageCarousel = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [images, setImages] = useState<Image[]>([])
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
 
+  // Fetch images from Supabase
+  useEffect(() => {
+    const fetchImages = async () => {
+      const { data, error } = await supabase.from('images').select('id, url')
+
+      if (error) {
+        console.error('Erreur lors de la récupération des images:', error)
+      } else {
+        setImages(data || [])
+      }
+    }
+
+    fetchImages()
+  }, [])
+
+  // Auto-scroll functionality
   useEffect(() => {
     if (emblaApi) {
       const intervalId = setInterval(() => {
-        emblaApi.scrollNext();
-      }, 5000);
+        emblaApi.scrollNext()
+      }, 5000)
 
-      return () => clearInterval(intervalId);
+      return () => clearInterval(intervalId)
     }
-  }, [emblaApi]);
+  }, [emblaApi])
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">Nos Activités en Images</h2>
-        <Carousel
-          opts={{ loop: true }}
-          className="w-full max-w-4xl mx-auto"
-          ref={emblaRef}
-        >
-          <CarouselContent>
-            {images.map((image, index) => (
-              <CarouselItem key={index}>
-                <div className="aspect-video w-full overflow-hidden rounded-lg">
-                  <img
-                    src={image.url}
-                    alt={image.alt}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
+    <section className='py-16 bg-white'>
+      <div className='container mx-auto px-4'>
+        <h2 className='text-3xl font-bold text-center mb-12'>
+          Nos Activités en Images
+        </h2>
+        {images.length > 0 ? (
+          <Carousel
+            opts={{ loop: true }}
+            className='w-full max-w-4xl mx-auto'
+            ref={emblaRef}
+          >
+            <CarouselContent>
+              {images.map(image => (
+                <CarouselItem key={image.id}>
+                  <div className='aspect-video w-full overflow-hidden rounded-lg'>
+                    <img
+                      src={image.url}
+                      alt={`Image ${image.id}`}
+                      className='w-full h-full object-cover'
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        ) : (
+          <p className='text-center text-gray-500'>
+            Aucune image disponible pour le moment.
+          </p>
+        )}
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default ImageCarousel;
+export default ImageCarousel

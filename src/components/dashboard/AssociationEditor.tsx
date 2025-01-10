@@ -1,54 +1,57 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { GeneralInfoSection } from "./association/GeneralInfoSection";
-import { PartnersSection } from "./association/PartnersSection";
-import { KeyPointsSection } from "./association/KeyPointsSection";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
-import { Json } from "@/integrations/supabase/types";
+import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { GeneralInfoSection } from './association/GeneralInfoSection'
+import { PartnersSection } from './association/PartnersSection'
+import { KeyPointsSection } from './association/KeyPointsSection'
+import { supabase } from '@/integrations/supabase/client'
+import { toast } from 'sonner'
+import { Toaster } from '@/components/ui/sonner'
+import { Json } from '@/integrations/supabase/types'
 
 interface Partner {
-  id: string;
-  name: string;
-  description: string;
-  logoUrl: string;
+  id: string
+  name: string
+  description: string
+  logoUrl: string
 }
 
 interface KeyPoint {
-  id: string;
-  title: string;
-  description: string;
-  iconName: string;
+  id: string
+  title: string
+  description: string
+  iconName: string
 }
 
-const ASSOCIATION_ID = "d129aa9c-c316-4cea-b3dc-45699cac3be5"; // Using a proper UUID
+const ASSOCIATION_ID = 'd129aa9c-c316-4cea-b3dc-45699cac3be5' // Using a proper UUID
 
 const AssociationEditor = () => {
   const [associationData, setAssociationData] = useState({
-    name: "UGESSAP",
-    shortDescription: "Union de Gestion des Établissements des Services de Santé et d'Aide à la Personne",
-    longDescription: "L'UGESSAP est une association loi 1901 créée en 2020, dédiée à la santé de proximité. Notre mission est d'améliorer l'accès aux soins et aux services d'aide à la personne dans les zones urbaines et rurales, en favorisant la coordination entre les différents acteurs de santé.",
-    logoUrl: "/placeholder.svg",
-  });
+    name: 'UGESSAP',
+    shortDescription:
+      "Union de Gestion des Établissements des Services de Santé et d'Aide à la Personne",
+    longDescription:
+      "L'UGESSAP est une association loi 1901 créée en 2020, dédiée à la santé de proximité. Notre mission est d'améliorer l'accès aux soins et aux services d'aide à la personne dans les zones urbaines et rurales, en favorisant la coordination entre les différents acteurs de santé.",
+    logoUrl: '/placeholder.svg'
+  })
 
   const [partners, setPartners] = useState<Partner[]>([
     {
-      id: "1",
-      name: "ARS Île-de-France",
-      description: "Agence Régionale de Santé",
-      logoUrl: "/placeholder.svg",
-    },
-  ]);
+      id: '1',
+      name: 'ARS Île-de-France',
+      description: 'Agence Régionale de Santé',
+      logoUrl: '/placeholder.svg'
+    }
+  ])
 
   const [keyPoints, setKeyPoints] = useState<KeyPoint[]>([
     {
-      id: "1",
-      title: "Structure",
-      description: "Association loi 1901 créée en 2020, dédiée à la santé de proximité",
-      iconName: "Building2",
-    },
-  ]);
+      id: '1',
+      title: 'Structure',
+      description:
+        'Association loi 1901 créée en 2020, dédiée à la santé de proximité',
+      iconName: 'Building2'
+    }
+  ])
 
   useEffect(() => {
     const fetchAssociationData = async () => {
@@ -57,127 +60,141 @@ const AssociationEditor = () => {
           .from('association')
           .select('*')
           .eq('id', ASSOCIATION_ID)
-          .maybeSingle();
+          .maybeSingle()
 
-        if (error) throw error;
+        if (error) throw error
 
         if (data) {
           setAssociationData({
             name: data.name,
-            shortDescription: data.description || "",
-            longDescription: data.description || "",
-            logoUrl: data.logo || "/placeholder.svg",
-          });
+            shortDescription: data.short_description || '',
+            longDescription: data.description || '',
+            logoUrl: data.logo || '/placeholder.svg'
+          })
 
           if (data.partners) {
             const partnersData = (data.partners as any[]).map(partner => ({
               id: partner.id || String(Date.now()),
-              name: partner.name || "",
-              description: partner.description || "",
-              logoUrl: partner.logo_url || "/placeholder.svg",
-            }));
-            setPartners(partnersData);
+              name: partner.name || '',
+              description: partner.description || '',
+              logoUrl: partner.logo_url || '/placeholder.svg'
+            }))
+            setPartners(partnersData)
           }
 
           if (data.key_points) {
             const keyPointsData = (data.key_points as any[]).map(point => ({
               id: point.id || String(Date.now()),
-              title: point.title || "",
-              description: point.description || "",
-              iconName: point.icon_name || "Building2",
-            }));
-            setKeyPoints(keyPointsData);
+              title: point.title || '',
+              description: point.description || '',
+              iconName: point.icon_name || 'Building2'
+            }))
+            setKeyPoints(keyPointsData)
           }
         }
       } catch (error) {
-        console.error('Error fetching association data:', error);
-        toast.error("Erreur lors du chargement des données");
+        console.error('Error fetching association data:', error)
+        toast.error('Erreur lors du chargement des données')
       }
-    };
+    }
 
-    fetchAssociationData();
-  }, []);
+    fetchAssociationData()
+  }, [])
 
   const handleGeneralInfoUpdate = (field: string, value: string) => {
-    setAssociationData((prev) => ({ ...prev, [field]: value }));
-  };
+    setAssociationData(prev => ({ ...prev, [field]: value }))
+  }
 
   const addPartner = () => {
     const newPartner: Partner = {
       id: Date.now().toString(),
-      name: "",
-      description: "",
-      logoUrl: "/placeholder.svg",
-    };
-    setPartners([...partners, newPartner]);
-  };
+      name: '',
+      description: '',
+      logoUrl: '/placeholder.svg'
+    }
+    setPartners([...partners, newPartner])
+  }
 
   const removePartner = (id: string) => {
-    setPartners(partners.filter(partner => partner.id !== id));
-  };
+    setPartners(partners.filter(partner => partner.id !== id))
+  }
 
   const updatePartner = (id: string, field: string, value: string) => {
-    setPartners(partners.map(p =>
-      p.id === id ? { ...p, [field]: value } : p
-    ));
-  };
+    setPartners(partners.map(p => (p.id === id ? { ...p, [field]: value } : p)))
+  }
 
   const addKeyPoint = () => {
     const newKeyPoint: KeyPoint = {
       id: Date.now().toString(),
-      title: "",
-      description: "",
-      iconName: "Building2",
-    };
-    setKeyPoints([...keyPoints, newKeyPoint]);
-  };
+      title: '',
+      description: '',
+      iconName: 'Building2'
+    }
+    setKeyPoints([...keyPoints, newKeyPoint])
+  }
 
   const removeKeyPoint = (id: string) => {
-    setKeyPoints(keyPoints.filter(point => point.id !== id));
-  };
+    setKeyPoints(keyPoints.filter(point => point.id !== id))
+  }
 
   const updateKeyPoint = (id: string, field: string, value: string) => {
-    setKeyPoints(keyPoints.map(p =>
-      p.id === id ? { ...p, [field]: value } : p
-    ));
-  };
+    setKeyPoints(
+      keyPoints.map(p => (p.id === id ? { ...p, [field]: value } : p))
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
       // Transform partners and keyPoints to match the Json type
       const partnersJson = partners.map(partner => ({
         ...partner,
         logo_url: partner.logoUrl
-      })) as Json[];
+      })) as Json[]
 
       const keyPointsJson = keyPoints.map(point => ({
         ...point,
         icon_name: point.iconName
-      })) as Json[];
+      })) as Json[]
+
+      console.log({
+        name: associationData.name,
+        description: associationData.longDescription,
+        short_description: associationData.shortDescription,
+        logo: associationData.logoUrl,
+        partners: partners.map(partner => ({
+          ...partner,
+          logo_url: partner.logoUrl
+        })),
+        key_points: keyPoints.map(point => ({
+          ...point,
+          icon_name: point.iconName
+        }))
+      })
 
       const { error } = await supabase
         .from('association')
         .update({
           name: associationData.name,
           description: associationData.longDescription,
+          short_description: associationData.shortDescription,
           logo: associationData.logoUrl,
           partners: partnersJson,
-          key_points: keyPointsJson,
+          key_points: keyPointsJson
         })
-        .eq('id', ASSOCIATION_ID);
+        .eq('id', ASSOCIATION_ID)
 
-      if (error) throw error;
-      toast.success("Modifications enregistrées avec succès");
+      if (error) throw error
+      toast.success('Modifications enregistrées avec succès')
     } catch (error) {
-      console.error('Error saving association data:', error);
-      toast.error("Erreur lors de l'enregistrement des modifications");
+      console.error('Error saving association data:', error)
+      toast.error("Erreur lors de l'enregistrement des modifications")
     }
-  };
+  }
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className='space-y-6'>
         <GeneralInfoSection
           {...associationData}
           onUpdate={handleGeneralInfoUpdate}
@@ -194,13 +211,13 @@ const AssociationEditor = () => {
           onRemoveKeyPoint={removeKeyPoint}
           onUpdateKeyPoint={updateKeyPoint}
         />
-        <Button type="submit" className="w-full">
+        <Button type='submit' className='w-full'>
           Enregistrer les modifications
         </Button>
       </form>
       <Toaster />
     </>
-  );
-};
+  )
+}
 
-export default AssociationEditor;
+export default AssociationEditor
