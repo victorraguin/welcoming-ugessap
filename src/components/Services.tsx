@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowRight, LucideProps } from 'lucide-react'
 import { useServices } from '@/hooks/useServices'
 import { useEffect } from 'react'
+import { getButtonAction } from '@/lib/utils'
 
 const ServicesSection = () => {
   const { services, isLoading, isError, fetchServices } = useServices()
@@ -21,19 +22,6 @@ const ServicesSection = () => {
   if (isError) {
     console.error('Error loading services')
     toast.error('Erreur lors du chargement des service')
-  }
-
-  const getButtonAction = (link: string): string => {
-    if (/^https?:\/\//.test(link)) {
-      return link // Lien URL
-    } else if (/^[\w.%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(link)) {
-      return `mailto:${link}` // Adresse email
-    } else if (/^\d{10}$/.test(link)) {
-      return `tel:${link}` // Numéro de téléphone français
-    } else {
-      console.warn(`Format inconnu pour le lien: ${link}`)
-      return '#' // Lien invalide
-    }
   }
 
   const getOpeningStatus = (

@@ -182,6 +182,7 @@ export type Database = {
           short_description: string | null
           title: string
           updated_at: string | null
+          slug: string
         }
         Insert: {
           address?: string | null

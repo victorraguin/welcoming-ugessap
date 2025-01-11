@@ -26,7 +26,8 @@ export const useServices = () => {
         .select(
           `
           *,
-          service_buttons(*)
+          service_buttons(*),
+          team(*)
         `
         )
         .order('order_index', { ascending: true })

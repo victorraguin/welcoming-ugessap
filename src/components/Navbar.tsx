@@ -39,12 +39,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navLinks = [
-    { name: 'Accueil', path: '/' },
-    { name: "L'association", path: '/association' },
-    { name: 'Contact', path: '/contact' }
-  ]
-
   return (
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
@@ -96,7 +90,7 @@ const Navbar = () => {
                     : services?.map(service => (
                         <Link
                           key={service.id}
-                          to={`/services/${service.id}`}
+                          to={`/services/${service.slug}`}
                           className='text-sm hover:text-primary transition-colors px-2 py-1 rounded-md hover:bg-accent'
                           onClick={() => setIsOpen(false)}
                         >

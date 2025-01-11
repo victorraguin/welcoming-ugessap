@@ -60,6 +60,15 @@ export const ServiceForm = ({
       {isExpanded && (
         <CardContent className='space-y-6'>
           <div className='grid gap-4'>
+            {/* Exemple de champ pour le slug */}
+            <div className='grid gap-2'>
+              <Label>Slug (Exemple : centre-de-sante)</Label>
+              <Input
+                value={service.slug ?? ''}
+                onChange={e => onUpdate(service.id, 'slug', e.target.value)}
+                placeholder="Ex: 'centre-de-sante' ou 'med-event'"
+              />
+            </div>
             <div className='grid gap-2'>
               <a
                 href='https://lucide.dev/icons/'
@@ -75,6 +84,7 @@ export const ServiceForm = ({
                 placeholder="Nom de l'icône (ex: LayoutGrid)"
               />
             </div>
+
             <div className='grid gap-2'>
               <Label>Titre</Label>
               <Input

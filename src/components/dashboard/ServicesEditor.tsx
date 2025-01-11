@@ -11,7 +11,6 @@ import { useQueryClient } from '@tanstack/react-query'
 
 const ServicesEditor = () => {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const {
     services,
     isLoading,
@@ -63,7 +62,8 @@ const ServicesEditor = () => {
           address: JSON.stringify(service.address),
           schedule: service.hours,
           maps_url: service.maps_url,
-          order_index: service.order_index
+          order_index: service.order_index,
+          slug: service.slug
         })
 
         handleButtonsUpdate(service.id, service.buttons)

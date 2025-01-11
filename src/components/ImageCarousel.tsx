@@ -1,10 +1,3 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious
-} from '@/components/ui/carousel'
 import { useEffect, useState } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { supabase } from '@/integrations/supabase/client'
@@ -16,7 +9,11 @@ interface Image {
 
 const ImageCarousel = () => {
   const [images, setImages] = useState<Image[]>([])
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'start',
+    skipSnaps: false
+  })
 
   // Fetch images from Supabase
   useEffect(() => {
@@ -38,11 +35,13 @@ const ImageCarousel = () => {
     if (emblaApi) {
       const intervalId = setInterval(() => {
         emblaApi.scrollNext()
-      }, 5000)
+      }, 4000) // Défilement toutes les 4 secondes
 
       return () => clearInterval(intervalId)
     }
   }, [emblaApi])
+
+  if (images.length === 0) return null
 
   return (
     <section className='py-16 bg-white'>
@@ -51,27 +50,25 @@ const ImageCarousel = () => {
           Nos Activités en Images
         </h2>
         {images.length > 0 ? (
-          <Carousel
-            opts={{ loop: true }}
-            className='w-full max-w-4xl mx-auto'
+          <div
+            className='w-full max-w-4xl mx-auto overflow-hidden'
             ref={emblaRef}
           >
-            <CarouselContent>
+            <div className='flex space-x-4'>
               {images.map(image => (
-                <CarouselItem key={image.id}>
-                  <div className='aspect-video w-full overflow-hidden rounded-lg'>
-                    <img
-                      src={image.url}
-                      alt={`Image ${image.id}`}
-                      className='w-full h-full object-cover'
-                    />
-                  </div>
-                </CarouselItem>
+                <div
+                  key={image.id}
+                  className='min-w-[150px] md:min-w-[200px] max-w-[300px] aspect-square overflow-hidden rounded-lg shadow'
+                >
+                  <img
+                    src={image.url}
+                    alt={`Image ${image.id}`}
+                    className='w-full h-full object-cover'
+                  />
+                </div>
               ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
+            </div>
+          </div>
         ) : (
           <p className='text-center text-gray-500'>
             Aucune image disponible pour le moment.

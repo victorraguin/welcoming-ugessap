@@ -18,6 +18,7 @@ export const transformServiceFromDb = (
     address: service.address ? JSON.parse(service.address) : undefined,
     maps_url: service.maps_url || undefined,
     order_index: service.order_index,
+    slug: service.slug,
     hours: {
       monday: schedule.monday || undefined,
       tuesday: schedule.tuesday || undefined,

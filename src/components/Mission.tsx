@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/integrations/supabase/client'
+import DOMPurify from 'dompurify'
 
 interface Association {
   name: string
@@ -32,45 +33,21 @@ const Mission = () => {
       <div className='container mx-auto px-4'>
         <h2 className='text-3xl font-bold text-center mb-12'>Notre Mission</h2>
 
-        <div className='max-w-4xl mx-auto space-y-6 text-gray-600'>
+        <div className='max-w-4xl mx-auto space-y-6 text-gray-600 text-left'>
           {/* Texte principal avec données dynamiques */}
           <p className='text-lg'>
             Bienvenue sur le site de l'association{' '}
             <span className='text-primary font-semibold'>
               {association?.name || 'UGESSAP'}
             </span>
-            , dédiée à la santé et au bien-être.{' '}
-            {association?.description || (
-              <>
-                Nous proposons{' '}
-                <span className='text-primary font-semibold'>
-                  trois services principaux
-                </span>
-                : le centre de santé, où des professionnels qualifiés offrent
-                des soins de proximité ; notre accompagnement en crèches, avec
-                des infirmières et des pédiatres intervenant directement pour
-                assurer le suivi médical des enfants ; et Med'event, un service
-                spécialisé dans la prise en charge médicale lors d'événements
-                sportifs, culturels et festifs.
-              </>
-            )}
-          </p>
-
-          <p className='text-lg'>
-            Notre mission est{' '}
-            <span className='text-primary font-semibold'>
-              d'assurer une prise en charge adaptée et accessible
-            </span>
-            , que ce soit dans un cadre quotidien ou lors de grands
-            rassemblements.
-          </p>
-
-          {/* Lien dynamique */}
-          <p className='text-lg font-medium text-primary text-center mt-8'>
-            <Link to='/services' className='hover:underline'>
-              Parcourez notre site pour découvrir nos engagements, notre équipe
-              et nos solutions pour répondre à vos besoins !
-            </Link>
+            , dédiée à la santé et au bien-être. <br />
+            <br />
+            <div
+              className='text-lg'
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(association?.description || '')
+              }}
+            ></div>
           </p>
         </div>
       </div>

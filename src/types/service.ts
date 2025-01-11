@@ -5,6 +5,7 @@ export interface Service {
   id: string
   icon: string
   title: string
+  slug: string
   shortDescription: string
   longDescription: string
   address?: {
@@ -26,7 +27,8 @@ export interface Service {
   keyPoints: Array<{
     id: string
     icon: string
-    text: string
+    description: string
+    title: string
   }>
   images: Array<{
     id: string
