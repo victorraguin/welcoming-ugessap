@@ -1,91 +1,149 @@
+import { useEffect, useState } from 'react'
+import { supabase } from '@/integrations/supabase/client'
 import { Building2, Users, Trophy, Briefcase } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import DOMPurify from 'dompurify'
+import Loader from '@/components/Loader'
+import { Link } from 'react-router-dom'
+
+// Types pour TypeScript (optionnel)
+interface AssociationRecord {
+  id: string
+  name: string
+  description: string
+  logo: string
+  partners: {
+    name: string
+    logoUrl: string
+    description: string
+  }[]
+  key_points: {
+    icon: string
+    title: string
+    description: string
+  }[]
+  is_open_for_recruitment: boolean
+  short_description: string
+}
+
+interface AssociationJob {
+  id: string
+  association_id: string
+  title: string
+  description: string
+  image: string
+  created_at: string
+  updated_at: string
+}
+
+interface TeamMember {
+  id: string
+  image: string
+  person_name: string
+  job_title: string
+  service_id: string
+  created_at: string
+  updated_at: string
+}
+
+// Pour mapper icon string => composant Lucide
+const iconsMap = {
+  Building2,
+  Users,
+  Trophy,
+  Briefcase
+}
 
 const Association = () => {
-  const keyPoints = [
-    {
-      icon: Building2,
-      title: 'Structure',
-      description:
-        'Association loi 1901 créée en 2020, dédiée à la santé de proximité'
-    },
-    {
-      icon: Users,
-      title: 'Équipe',
-      description: 'Plus de 50 professionnels de santé engagés'
-    },
-    {
-      icon: Trophy,
-      title: 'Impact',
-      description: 'Plus de 10 000 patients accompagnés depuis notre création'
-    },
-    {
-      icon: Briefcase,
-      title: 'Expertise',
-      description: 'Services de santé innovants et accessibles'
-    }
-  ]
+  // États pour nos données
+  const [association, setAssociation] = useState<AssociationRecord | null>(null)
+  const [jobs, setJobs] = useState<AssociationJob[]>([])
+  const [team, setTeam] = useState<TeamMember[]>([])
 
-  const teamMembers = [
-    {
-      name: 'Dr. Sophie Martin',
-      role: 'Directrice Médicale',
-      image: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952',
-      description: "Médecin généraliste avec 15 ans d'expérience"
-    },
-    {
-      name: 'Jean Dupont',
-      role: 'Directeur Administratif',
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
-      description: "Expert en gestion d'établissements de santé"
-    },
-    {
-      name: 'Marie Lambert',
-      role: 'Responsable des Opérations',
-      image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
-      description: 'Coordinatrice des services et des équipes'
-    },
-    {
-      name: 'Dr. Thomas Bernard',
-      role: "Responsable Med'event",
-      image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
-      description: 'Spécialiste en médecine du sport et événementielle'
-    }
-  ]
+  // États chargement/erreurs
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const partners = [
-    {
-      name: 'ARS Île-de-France',
-      logo: '/placeholder.svg',
-      description: 'Agence Régionale de Santé'
-    },
-    {
-      name: 'CPAM',
-      logo: '/placeholder.svg',
-      description: "Caisse Primaire d'Assurance Maladie"
-    },
-    {
-      name: 'Ville de Paris',
-      logo: '/placeholder.svg',
-      description: 'Mairie de Paris'
-    }
-  ]
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
 
-  const positions = [
-    {
-      title: 'Médecin généraliste',
-      type: 'CDI',
-      location: 'Paris'
-    },
-    {
-      title: 'Infirmier(e)',
-      type: 'CDI',
-      location: 'Paris'
+        // 1) Récupérer l’association (supposons qu’il n’y en ait qu’une)
+        const { data: assocData, error: assocError } = await supabase
+          .from('association')
+          .select('*')
+          .single() // single() => on prend la première occurrence
+        if (assocError) throw assocError
+        if (!assocData) {
+          throw new Error('Aucune association trouvée dans la table.')
+        }
+
+        setAssociation({
+          ...assocData,
+          key_points: assocData.key_points as AssociationRecord['key_points'],
+          partners: assocData.partners as AssociationRecord['partners']
+        })
+
+        // 2) Récupérer les jobs liés à association_id
+        const { data: jobsData, error: jobsError } = await supabase
+          .from('association_jobs')
+          .select('*')
+          .eq('association_id', assocData.id)
+        if (jobsError) throw jobsError
+        setJobs(jobsData || [])
+
+        // 3) Récupérer l’équipe
+        const { data: teamData, error: teamError } = await supabase
+          .from('team')
+          .select('*')
+        if (teamError) {
+          // On log l’erreur, mais on ne bloque pas
+          console.error('Erreur fetch team:', teamError)
+        } else {
+          setTeam(teamData || [])
+        }
+      } catch (err: any) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    fetchData()
+  }, [])
+
+  // Gestion des états
+  if (loading) {
+    return <Loader />
+  }
+
+  if (error) {
+    return (
+      <p className='p-8 text-center text-red-500'>
+        Erreur lors du chargement : {error}
+      </p>
+    )
+  }
+
+  if (!association) {
+    return <p className='p-8 text-center'>Aucune association à afficher.</p>
+  }
+
+  // On déstructure l’association
+  const {
+    name,
+    short_description,
+    description,
+    logo,
+    key_points = [],
+    partners = [],
+    is_open_for_recruitment
+  } = association
 
   return (
     <div className='min-h-screen flex flex-col'>
@@ -98,24 +156,17 @@ const Association = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
               <div>
                 <h1 className='text-4xl md:text-5xl font-bold mb-6 slide-up'>
-                  UGESSAP
+                  {name}
                 </h1>
                 <p className='text-lg text-gray-600 mb-8 slide-up'>
-                  Union de Gestion des Établissements des Services de Santé et
-                  d'Aide à la Personne
+                  {short_description}
                 </p>
-                <div className='flex items-center gap-4 fade-in'>
-                  <img
-                    src='/placeholder.svg'
-                    alt='Logo UGESSAP'
-                    className='w-24 h-24 object-contain'
-                  />
-                </div>
               </div>
+              {/* Image illustrant l’association (à adapter selon vos besoins) */}
               <div className='relative'>
                 <img
-                  src='https://images.unsplash.com/photo-1649972904349-6e44c42644a7'
-                  alt='Équipe UGESSAP'
+                  src={logo}
+                  alt={name}
                   className='rounded-lg shadow-xl w-full fade-in'
                 />
               </div>
@@ -130,142 +181,142 @@ const Association = () => {
               Notre Mission
             </h2>
             <div className='max-w-4xl mx-auto space-y-6 text-gray-600'>
-              <p className='text-lg'>
-                UGESSAP est une association dédiée à la santé et au bien-être,
-                proposant trois services principaux : le centre de santé, où des
-                professionnels qualifiés offrent des soins de proximité ; notre
-                accompagnement en crèches, avec des infirmières et des pédiatres
-                intervenant directement pour assurer le suivi médical des
-                enfants ; et Med'event, un service spécialisé dans la prise en
-                charge médicale lors d'événements sportifs, culturels et
-                festifs.
-              </p>
-              <p className='text-lg'>
-                Notre mission est d'assurer une prise en charge adaptée et
-                accessible, que ce soit dans un cadre quotidien ou lors de
-                grands rassemblements. Nous nous engageons à fournir des
-                services de santé de qualité, tout en maintenant une approche
-                humaine et personnalisée.
-              </p>
+              <div
+                className='text-lg'
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(association?.description || '')
+                }}
+              ></div>
             </div>
           </div>
         </section>
 
-        {/* Points Clés */}
-        <section className='py-16'>
-          <div className='container mx-auto px-4'>
-            <h2 className='text-3xl font-bold text-center mb-12'>
-              Nos points clés
-            </h2>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-              {keyPoints.map((point, index) => (
-                <Card key={index} className='card-hover'>
-                  <CardContent className='p-6'>
-                    <point.icon className='w-12 h-12 text-primary mb-4' />
-                    <h3 className='text-xl font-semibold mb-2'>
-                      {point.title}
-                    </h3>
-                    <p className='text-gray-600'>{point.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
+        {/* Points clés */}
+        {key_points.length > 0 && (
+          <section className='py-16'>
+            <div className='container mx-auto px-4'>
+              <h2 className='text-3xl font-bold text-center mb-12'>
+                Nos points clés
+              </h2>
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+                {key_points.map((point, idx) => {
+                  const IconComponent =
+                    iconsMap[point.icon as keyof typeof iconsMap] || Building2
+                  return (
+                    <Card key={idx} className='card-hover'>
+                      <CardContent className='p-6'>
+                        <IconComponent className='w-12 h-12 text-primary mb-4' />
+                        <h3 className='text-xl font-semibold mb-2'>
+                          {point.title}
+                        </h3>
+                        <p className='text-gray-600'>{point.description}</p>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Équipe */}
-        <section className='py-16 bg-gray-50'>
-          <div className='container mx-auto px-4'>
-            <h2 className='text-3xl font-bold text-center mb-12'>
-              Notre Équipe
-            </h2>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-              {teamMembers.map((member, index) => (
-                <Card key={index} className='card-hover'>
-                  <CardContent className='p-6 text-center'>
-                    <Avatar className='w-24 h-24 mx-auto mb-4'>
-                      <AvatarImage src={member.image} alt={member.name} />
-                      <AvatarFallback>
-                        {member.name
-                          .split(' ')
-                          .map(n => n[0])
-                          .join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <h3 className='text-xl font-semibold mb-1'>
-                      {member.name}
-                    </h3>
-                    <p className='text-primary font-medium mb-2'>
-                      {member.role}
-                    </p>
-                    <p className='text-gray-600 text-sm'>
-                      {member.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+        {team.length > 0 && (
+          <section className='py-16 bg-gray-50'>
+            <div className='container mx-auto px-4'>
+              <h2 className='text-3xl font-bold text-center mb-12'>
+                Notre Équipe
+              </h2>
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+                {team.map(member => (
+                  <Card key={member.id} className='card-hover'>
+                    <CardContent className='p-6 text-center'>
+                      <Avatar className='w-24 h-24 mx-auto mb-4'>
+                        <AvatarImage
+                          src={member.image}
+                          alt={member.person_name}
+                        />
+                        <AvatarFallback>
+                          {member.person_name
+                            .split(' ')
+                            .map(n => n[0])
+                            .join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <h3 className='text-xl font-semibold mb-1'>
+                        {member.person_name}
+                      </h3>
+                      <p className='text-primary font-medium mb-2'>
+                        {member.job_title}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Partenaires */}
-        <section className='bg-gray-50 py-16'>
-          <div className='container mx-auto px-4'>
-            <h2 className='text-3xl font-bold text-center mb-12'>
-              Nos partenaires
-            </h2>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-              {partners.map((partner, index) => (
-                <Card key={index} className='card-hover'>
-                  <CardContent className='p-6 text-center'>
-                    <img
-                      src={partner.logo}
-                      alt={partner.name}
-                      className='w-24 h-24 object-contain mx-auto mb-4'
-                    />
-                    <h3 className='text-xl font-semibold mb-2'>
-                      {partner.name}
-                    </h3>
-                    <p className='text-gray-600'>{partner.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
+        {partners.length > 0 && (
+          <section className='bg-gray-50 py-16'>
+            <div className='container mx-auto px-4'>
+              <h2 className='text-3xl font-bold text-center mb-12'>
+                Nos partenaires
+              </h2>
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+                {partners.map((partner, index) => (
+                  <Card key={index} className='card-hover'>
+                    <CardContent className='p-6 text-center'>
+                      {partner.logoUrl && (
+                        <img
+                          src={partner.logoUrl}
+                          alt={partner.name}
+                          className='w-24 h-24 object-contain mx-auto mb-4'
+                        />
+                      )}
+                      <h3 className='text-xl font-semibold mb-2'>
+                        {partner.name}
+                      </h3>
+                      <p className='text-gray-600'>{partner.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Recrutement */}
-        <section className='py-16'>
-          <div className='container mx-auto px-4'>
-            <h2 className='text-3xl font-bold text-center mb-12'>
-              Nous recrutons
-            </h2>
-            <div className='max-w-2xl mx-auto'>
-              {positions.map((position, index) => (
-                <Card key={index} className='mb-4 card-hover'>
-                  <CardContent className='p-6'>
-                    <div className='flex justify-between items-center'>
-                      <div>
-                        <h3 className='text-xl font-semibold'>
-                          {position.title}
-                        </h3>
-                        <p className='text-gray-600'>
-                          {position.type} - {position.location}
-                        </p>
+        {/* On n’affiche cette section que si is_open_for_recruitment === true */}
+        {is_open_for_recruitment && jobs.length > 0 && (
+          <section className='py-16'>
+            <div className='container mx-auto px-4'>
+              <h2 className='text-3xl font-bold text-center mb-12'>
+                Nous recrutons
+              </h2>
+              <div className='max-w-2xl mx-auto'>
+                {jobs.map(job => (
+                  <Card key={job.id} className='mb-4 card-hover'>
+                    <CardContent className='p-6'>
+                      <div className='flex flex-col md:flex-row md:justify-between md:items-center'>
+                        <div className='mb-4 md:mb-0'>
+                          <h3 className='text-xl font-semibold'>{job.title}</h3>
+                          <p className='text-gray-600'>{job.description}</p>
+                        </div>
+                        <Link
+                          to={`/contact?tab=recruitment&position=${job.title}`}
+                          className='text-primary hover:underline mt-4 md:mt-0 md:ml-4'
+                        >
+                          Postuler
+                        </Link>
                       </div>
-                      <a
-                        href='mailto:contact@ugessap.fr'
-                        className='text-primary hover:underline'
-                      >
-                        Postuler
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
 
       <Footer />

@@ -83,7 +83,7 @@ export default function TeamEditor () {
               ) ||
               servicesList[0] ||
               'Service inconnu',
-            photoUrl: member.image || 'https://via.placeholder.com/128'
+            photoUrl: member.image || 'https://placehold.co/128'
           }))
           setTeamMembers(members)
         }
@@ -104,7 +104,7 @@ export default function TeamEditor () {
       name: '',
       role: '',
       service: servicesList[0] || 'Service inconnu', // Par défaut, le premier service valide
-      photoUrl: 'https://via.placeholder.com/128'
+      photoUrl: 'https://placehold.co/128'
     }
     setTeamMembers(prev => [...prev, newMember])
   }

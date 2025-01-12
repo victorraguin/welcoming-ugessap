@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/integrations/supabase/client'
@@ -45,20 +45,58 @@ const ServicesSection = () => {
     const day = frenchToEnglishDays[frenchDay] // Convertir en anglais
     const time = now.getHours() * 60 + now.getMinutes() // Convertir l'heure actuelle en minutes
 
+    // Vérifier si tous les jours ont des horaires `undefined`
+    const allUndefined = Object.values(hours).every(
+      value => value === undefined
+    )
+    if (allUndefined) {
+      return null // Pas d'horaires définis pour ce service
+    }
+
     const todayHours = hours[day]
 
-    if (!todayHours) return null // Retourner null si pas d'horaires pour aujourd'hui
+    // Si aujourd'hui est fermé ou sans horaires
+    if (!todayHours || todayHours === 'Fermé') {
+      // Trouver la prochaine ouverture
+      for (let i = 1; i <= 7; i++) {
+        const nextDayIndex = (englishDays.indexOf(day) + i) % 7
+        const nextDay = englishDays[nextDayIndex]
+        const nextDayHours = hours[nextDay]
 
-    // Récupérer les périodes d'aujourd'hui
-    const periods = todayHours
-      ? todayHours.split(',').map(period => {
-          const [start, end] = period.split('-').map(h => {
+        if (nextDayHours && nextDayHours !== 'Fermé') {
+          const nextOpeningPeriod = nextDayHours.split(',')[0]
+          const [nextStart] = nextOpeningPeriod.split('-').map(h => {
             const [hour, minute] = h.split('h').map(Number)
-            return hour * 60 + (minute || 0) // Convertir l'heure en minutes
+            return `${hour}h${minute || '00'}`
           })
-          return { start, end }
-        })
-      : []
+
+          const nextOpeningDate = new Date()
+          nextOpeningDate.setDate(now.getDate() + i)
+          const formattedDate = nextOpeningDate.toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long'
+          })
+
+          return {
+            status: `Fermé - Prochaine ouverture le ${formattedDate} à ${nextStart}`,
+            color: 'text-red-500'
+          }
+        }
+      }
+
+      // Si aucune prochaine ouverture n'est trouvée
+      return { status: 'Fermé', color: 'text-red-500' }
+    }
+
+    // Traiter les horaires d'aujourd'hui
+    const periods = todayHours.split(',').map(period => {
+      const [start, end] = period.split('-').map(h => {
+        const [hour, minute] = h.split('h').map(Number)
+        return hour * 60 + (minute || 0)
+      })
+      return { start, end }
+    })
 
     for (const { start, end } of periods) {
       if (time >= start && time < end) {
@@ -84,35 +122,7 @@ const ServicesSection = () => {
       }
     }
 
-    // Si fermé aujourd'hui, trouver la prochaine ouverture
-    for (let i = 1; i <= 7; i++) {
-      const nextDayIndex = (englishDays.indexOf(day) + i) % 7
-      const nextDay = englishDays[nextDayIndex]
-      const nextDayHours = hours[nextDay]
-
-      if (nextDayHours) {
-        const nextOpeningPeriod = nextDayHours.split(',')[0]
-        const [nextStart] = nextOpeningPeriod.split('-').map(h => {
-          const [hour, minute] = h.split('h').map(Number)
-          return `${hour}h${minute || '00'}`
-        })
-
-        const nextOpeningDate = new Date()
-        nextOpeningDate.setDate(now.getDate() + i)
-        const formattedDate = nextOpeningDate.toLocaleDateString('fr-FR', {
-          weekday: 'long',
-          day: '2-digit',
-          month: 'long'
-        })
-
-        return {
-          status: `Fermé - Prochaine ouverture le ${formattedDate} à ${nextStart}`,
-          color: 'text-red-500'
-        }
-      }
-    }
-
-    // Par défaut, considéré comme fermé sans horaires définis
+    // Si fermé sans horaires d'ouverture aujourd'hui
     return { status: 'Fermé', color: 'text-red-500' }
   }
 
@@ -132,12 +142,6 @@ const ServicesSection = () => {
 
     return IconComponent as React.ElementType<LucideProps>
   }
-
-  const handleServiceAction = (serviceId: string, action: string) => {
-    toast.success(`Action ${action} pour le service ${serviceId}`)
-  }
-
-  console.log('services', services)
 
   return (
     <section id='services' className='py-16 bg-white'>
@@ -230,9 +234,17 @@ const ServicesSection = () => {
                             )
                           }
                         >
-                          Localisation
+                          Localisez-nous
                         </Button>
                       )}
+                      <Link to={`/services/${service.slug}`} className='mt-4'>
+                        <Button
+                          variant='ghost'
+                          className='text-primary hover:text-primary/80'
+                        >
+                          En savoir plus <ArrowRight className='ml-2 h-4 w-4' />
+                        </Button>
+                      </Link>
                       {openingStatus && (
                         <p
                           className={`text-sm text-center pt-2 ${openingStatus.color}`}

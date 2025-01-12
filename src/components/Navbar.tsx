@@ -41,9 +41,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/80 backdrop-blur-md shadow-sm' : 'bg-transparent'
-      }`}
+      className={`fixed w-full z-50 transition-all duration-300 bg-white/80`}
     >
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between h-16 items-center'>
@@ -171,7 +169,7 @@ const Navbar = () => {
                         key={service.id}
                         to={`/services/${service.id}`}
                         onClick={() => setIsOpen(false)}
-                        className='block py-2 text-foreground/80 hover:text-primary'
+                        className='block py-2  text-lg font-medium hover:text-primary'
                       >
                         {service.title}
                       </Link>

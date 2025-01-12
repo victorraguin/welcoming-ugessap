@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,9 +13,16 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem
+} from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { supabase } from '@/integrations/supabase/client'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 type ContactFormData = {
@@ -43,26 +49,57 @@ type RecruitmentFormData = {
   motivation: string
 }
 
+type Job = {
+  id: string
+  title: string
+}
+
 const Contact = () => {
   const { toast } = useToast()
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Extraire l'onglet actuel de l'URL ou utiliser "contact" par défaut
+  // Tabs logic
   const params = new URLSearchParams(location.search)
   const currentTab = params.get('tab') || 'contact'
+  const selectedPosition = params.get('position') || 'Candidature spontanée'
 
   const handleTabChange = (tab: string) => {
-    navigate(`?tab=${tab}`) // Mettre à jour l'URL
+    navigate(`?tab=${tab}`)
   }
 
-  // Formulaires
+  // Jobs state
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [loadingJobs, setLoadingJobs] = useState(true)
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoadingJobs(true)
+        const { data, error } = await supabase
+          .from('association_jobs')
+          .select('id, title')
+        if (error) throw error
+        setJobs(data || [])
+      } catch (error) {
+        console.error('Erreur lors de la récupération des postes:', error)
+      } finally {
+        setLoadingJobs(false)
+      }
+    }
+    fetchJobs()
+  }, [])
+
+  // Forms
   const contactForm = useForm<ContactFormData>()
   const complaintForm = useForm<ComplaintFormData>()
-  const recruitmentForm = useForm<RecruitmentFormData>()
+  const recruitmentForm = useForm<RecruitmentFormData>({
+    defaultValues: {
+      position: selectedPosition
+    }
+  })
 
   const onSubmit = (data: any, type: string) => {
-    console.log(`${type} form data:`, data)
     const messages = {
       contact: {
         title: 'Message envoyé',
@@ -82,6 +119,11 @@ const Contact = () => {
     if (type === 'contact') contactForm.reset()
     if (type === 'complaint') complaintForm.reset()
     if (type === 'recruitment') recruitmentForm.reset()
+  }
+
+  const handlePositionChange = (position: string) => {
+    recruitmentForm.setValue('position', position)
+    navigate(`?tab=recruitment&position=${encodeURIComponent(position)}`)
   }
 
   return (
@@ -342,10 +384,37 @@ const Contact = () => {
                           <FormItem>
                             <FormLabel>Poste recherché</FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder='Ex: Médecin, Infirmier(e)...'
-                                {...field}
-                              />
+                              <Select
+                                onValueChange={handlePositionChange}
+                                value={field.value}
+                              >
+                                <SelectTrigger>
+                                  {field.value || 'Sélectionnez un poste'}
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {loadingJobs ? (
+                                    <SelectItem value='loading' disabled>
+                                      Chargement des postes...
+                                    </SelectItem>
+                                  ) : (
+                                    <>
+                                      {jobs
+                                        .filter(job => job.title) // Filtre les titres vides ou indéfinis
+                                        .map(job => (
+                                          <SelectItem
+                                            key={job.id}
+                                            value={job.title}
+                                          >
+                                            {job.title}
+                                          </SelectItem>
+                                        ))}
+                                      <SelectItem value='Candidature spontanée'>
+                                        Candidature spontanée
+                                      </SelectItem>
+                                    </>
+                                  )}
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>

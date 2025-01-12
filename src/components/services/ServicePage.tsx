@@ -174,7 +174,7 @@ const ServicePage = ({ service }: ServicePageProps) => {
                             )
                           }
                         >
-                          Localisation
+                          Localisez-nous
                         </Button>
                       )}
                     </div>

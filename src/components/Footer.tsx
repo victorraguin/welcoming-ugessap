@@ -129,9 +129,17 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className='border-t border-gray-800 mt-8 pt-8 text-center'>
+        <div className='border-t border-gray-800 mt-8 pt-8 text-center flex flex-col items-center space-y-1'>
           <p className='text-sm'>
             © {new Date().getFullYear()} UGESSAP. Tous droits réservés.
+          </p>
+          <p className='text-sm'>
+            Conçu par les élèves du CNAM, réalisé par Victor Raguin.
+          </p>
+          <p className='text-sm'>
+            <a href='/login' className='hover:underline'>
+              Connexion
+            </a>
           </p>
         </div>
       </div>

@@ -3,6 +3,7 @@ import ServicePage from '@/components/services/ServicePage'
 import { useServices } from '@/hooks/useServices'
 import { Service, ServiceData } from '@/types/service'
 import { useEffect } from 'react'
+import Loader from '@/components/Loader'
 
 function DynamicServicePage () {
   const { slug } = useParams()
@@ -16,7 +17,7 @@ function DynamicServicePage () {
   console.log('services', services)
 
   // Pendant le chargement ou s'il y a une erreur
-  if (isLoading) return <p>Chargement en cours...</p>
+  if (isLoading) return <Loader />
   if (isError)
     return <p>Une erreur est survenue lors du chargement des services.</p>
 

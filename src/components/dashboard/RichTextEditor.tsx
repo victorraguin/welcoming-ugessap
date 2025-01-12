@@ -2,6 +2,8 @@ import { useRef, useEffect } from 'react'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
 
+const transparentOption = 'rgba(0, 0, 0, 0)'
+
 const RichTextEditor = ({
   value,
   onChange
@@ -31,7 +33,19 @@ const RichTextEditor = ({
                 ]
               }
             ], // Color dropdown
-            [{ background: [] }], // Background color
+            [
+              {
+                background: [
+                  transparentOption, // Ajout de l'option transparente
+                  '#2C89C3',
+                  '#fb923c',
+                  '#65a30d',
+                  '#ef4444',
+                  '#000000',
+                  '#ffffff'
+                ]
+              }
+            ], // Background color dropdown
             [{ list: 'ordered' }, { list: 'bullet' }] // Lists
           ]
         }

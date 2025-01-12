@@ -29,6 +29,17 @@ const Hero = () => {
     fetchAssociationData()
   }, [])
 
+  // Fonction utilitaire pour effectuer un smooth scroll
+  const handleSmoothScroll = (id: string) => {
+    const element = document.querySelector(id)
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+  }
+
   return (
     <div className='relative min-h-screen flex items-center justify-center overflow-hidden'>
       {/* Background image with overlay */}
@@ -40,7 +51,7 @@ const Hero = () => {
           backgroundPosition: 'center'
         }}
       >
-        <div className='absolute inset-0 bg-gradient-to-b from-gray-900/70 to-gray-900/50' />
+        <div className='absolute inset-0 bg-gradient-to-b from-gray-900/80 to-gray-900/60' />
       </div>
 
       <div className='container mx-auto px-4 pt-20 pb-16 relative z-10'>
@@ -58,7 +69,7 @@ const Hero = () => {
             <Button
               size='lg'
               className='w-full sm:w-auto text-base'
-              onClick={() => (window.location.href = '#services')}
+              onClick={() => handleSmoothScroll('#services')} // Smooth scroll vers #services
             >
               Nos services
               <ArrowRight className='ml-2 h-4 w-4' />
@@ -68,7 +79,7 @@ const Hero = () => {
               variant='outline'
               size='lg'
               className='w-full sm:w-auto text-base bg-white/10 hover:bg-white/20 text-white border-white/20'
-              onClick={() => (window.location.href = '#about')}
+              onClick={() => handleSmoothScroll('#mission')} // Smooth scroll vers #about
             >
               En savoir plus
             </Button>
