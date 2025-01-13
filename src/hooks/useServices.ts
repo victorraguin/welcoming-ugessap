@@ -15,12 +15,6 @@ export const useServices = () => {
   const fetchServices = async () => {
     setIsLoading(true)
     try {
-      const { data: session, error: sessionError } =
-        await supabase.auth.getSession()
-      if (sessionError || !session?.session) {
-        throw new Error('Not authenticated')
-      }
-
       const { data, error } = await supabase
         .from('services')
         .select(
