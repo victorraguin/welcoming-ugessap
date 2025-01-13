@@ -14,6 +14,7 @@ import TeamPage from '@/pages/dashboard/Team'
 import Login from '@/pages/Login'
 import DynamicServicePage from './pages/services/DynamicServicePage'
 import ScrollToTop from './components/ScrollToTop'
+import { HelmetProvider } from 'react-helmet-async'
 
 const queryClient = new QueryClient()
 queryClient.clear()
@@ -21,25 +22,33 @@ queryClient.clear()
 function App () {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          <Route path='/' element={<Index />} />
-          <Route path='/association' element={<Association />} />
-          <Route path='/contact' element={<Contact />} />
-          {/* Route dynamique pour tous les services : */}
-          <Route path='/services/:slug' element={<DynamicServicePage />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/dashboard' element={<DashboardIndex />} />
-          <Route path='/dashboard/association' element={<AssociationPage />} />
-          <Route path='/dashboard/services' element={<ServicesPage />} />
-          <Route path='/dashboard/images' element={<ImagesPage />} />
-          <Route path='/dashboard/reviews' element={<ReviewsPage />} />
-          <Route path='/dashboard/team' element={<TeamPage />} />
-          <Route path='/dashboard/recruitment' element={<RecruitmentPage />} />
-          <Route path='/dashboard/settings' element={<Settings />} />
-        </Routes>
-      </Router>
+      <HelmetProvider>
+        <Router>
+          <ScrollToTop />
+          <Routes>
+            <Route path='/' element={<Index />} />
+            <Route path='/association' element={<Association />} />
+            <Route path='/contact' element={<Contact />} />
+            {/* Route dynamique pour tous les services : */}
+            <Route path='/services/:slug' element={<DynamicServicePage />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/dashboard' element={<DashboardIndex />} />
+            <Route
+              path='/dashboard/association'
+              element={<AssociationPage />}
+            />
+            <Route path='/dashboard/services' element={<ServicesPage />} />
+            <Route path='/dashboard/images' element={<ImagesPage />} />
+            <Route path='/dashboard/reviews' element={<ReviewsPage />} />
+            <Route path='/dashboard/team' element={<TeamPage />} />
+            <Route
+              path='/dashboard/recruitment'
+              element={<RecruitmentPage />}
+            />
+            <Route path='/dashboard/settings' element={<Settings />} />
+          </Routes>
+        </Router>
+      </HelmetProvider>
     </QueryClientProvider>
   )
 }

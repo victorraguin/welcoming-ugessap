@@ -24,6 +24,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { supabase } from '@/integrations/supabase/client'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 
 type ContactFormData = {
   name: string
@@ -128,216 +129,52 @@ const Contact = () => {
   }
 
   return (
-    <div className='min-h-screen flex flex-col'>
-      <Navbar />
+    <>
+      <Helmet>
+        <title>UGESSAP - Contact</title>
+        <meta name='description' content='Bienvenue sur UGESSAP.' />
+        <meta property='og:title' content='UGESSAP - Contact' />
+        <meta property='og:description' content='Bienvenue sur UGESSAP.' />
+        <meta property='og:image' content='/ugessap-og-image.png' />
+      </Helmet>
+      <div className='min-h-screen flex flex-col'>
+        <Navbar />
 
-      <main className='flex-grow py-20 bg-gray-50'>
-        <div className='container mx-auto px-4'>
-          <h1 className='text-4xl font-bold text-center mb-12'>
-            Contactez-nous
-          </h1>
+        <main className='flex-grow py-20 bg-gray-50'>
+          <div className='container mx-auto px-4'>
+            <h1 className='text-4xl font-bold text-center mb-12'>
+              Contactez-nous
+            </h1>
 
-          <Card className='max-w-4xl mx-auto'>
-            <CardContent className='p-6'>
-              <Tabs
-                defaultValue={currentTab}
-                value={currentTab}
-                onValueChange={handleTabChange}
-                className='w-full'
-              >
-                <TabsList className='grid w-full grid-cols-3 mb-8'>
-                  <TabsTrigger value='contact'>Contact</TabsTrigger>
-                  <TabsTrigger value='complaint'>Réclamation</TabsTrigger>
-                  <TabsTrigger value='recruitment'>Recrutement</TabsTrigger>
-                </TabsList>
+            <Card className='max-w-4xl mx-auto'>
+              <CardContent className='p-6'>
+                <Tabs
+                  defaultValue={currentTab}
+                  value={currentTab}
+                  onValueChange={handleTabChange}
+                  className='w-full'
+                >
+                  <TabsList className='grid w-full grid-cols-3 mb-8'>
+                    <TabsTrigger value='contact'>Contact</TabsTrigger>
+                    <TabsTrigger value='complaint'>Réclamation</TabsTrigger>
+                    <TabsTrigger value='recruitment'>Recrutement</TabsTrigger>
+                  </TabsList>
 
-                {/* Contact Form */}
-                <TabsContent value='contact'>
-                  <Form {...contactForm}>
-                    <form
-                      onSubmit={contactForm.handleSubmit(data =>
-                        onSubmit(data, 'contact')
-                      )}
-                      className='space-y-6 '
-                    >
-                      <FormField
-                        control={contactForm.control}
-                        name='name'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nom complet</FormLabel>
-                            <FormControl>
-                              <Input placeholder='Votre nom' {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
+                  {/* Contact Form */}
+                  <TabsContent value='contact'>
+                    <Form {...contactForm}>
+                      <form
+                        onSubmit={contactForm.handleSubmit(data =>
+                          onSubmit(data, 'contact')
                         )}
-                      />
-                      <FormField
-                        control={contactForm.control}
-                        name='email'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='email'
-                                placeholder='votre@email.com'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={contactForm.control}
-                        name='subject'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Sujet</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder='Sujet de votre message'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={contactForm.control}
-                        name='message'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Message</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder='Votre message'
-                                className='min-h-[120px]'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type='submit' className='w-full'>
-                        Envoyer
-                      </Button>
-                    </form>
-                  </Form>
-                </TabsContent>
-
-                {/* Complaint Form */}
-                <TabsContent value='complaint'>
-                  <Form {...complaintForm}>
-                    <form
-                      onSubmit={complaintForm.handleSubmit(data =>
-                        onSubmit(data, 'complaint')
-                      )}
-                      className='space-y-6'
-                    >
-                      <FormField
-                        control={complaintForm.control}
-                        name='name'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nom complet</FormLabel>
-                            <FormControl>
-                              <Input placeholder='Votre nom' {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={complaintForm.control}
-                        name='email'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='email'
-                                placeholder='votre@email.com'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={complaintForm.control}
-                        name='serviceType'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Service concerné</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Ex: Centre de santé, Med'event..."
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={complaintForm.control}
-                        name='complaintDetails'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Détails de la réclamation</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder='Décrivez votre réclamation'
-                                className='min-h-[120px]'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type='submit' className='w-full'>
-                        Envoyer la réclamation
-                      </Button>
-                    </form>
-                  </Form>
-                </TabsContent>
-
-                {/* Recruitment Form */}
-                <TabsContent value='recruitment'>
-                  <Form {...recruitmentForm}>
-                    <form
-                      onSubmit={recruitmentForm.handleSubmit(data =>
-                        onSubmit(data, 'recruitment')
-                      )}
-                      className='space-y-6'
-                    >
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                        className='space-y-6 '
+                      >
                         <FormField
-                          control={recruitmentForm.control}
-                          name='firstName'
+                          control={contactForm.control}
+                          name='name'
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Prénom</FormLabel>
-                              <FormControl>
-                                <Input placeholder='Votre prénom' {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={recruitmentForm.control}
-                          name='lastName'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nom</FormLabel>
+                              <FormLabel>Nom complet</FormLabel>
                               <FormControl>
                                 <Input placeholder='Votre nom' {...field} />
                               </FormControl>
@@ -345,10 +182,8 @@ const Contact = () => {
                             </FormItem>
                           )}
                         />
-                      </div>
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                         <FormField
-                          control={recruitmentForm.control}
+                          control={contactForm.control}
                           name='email'
                           render={({ field }) => (
                             <FormItem>
@@ -365,110 +200,291 @@ const Contact = () => {
                           )}
                         />
                         <FormField
-                          control={recruitmentForm.control}
-                          name='phone'
+                          control={contactForm.control}
+                          name='subject'
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Téléphone</FormLabel>
+                              <FormLabel>Sujet</FormLabel>
                               <FormControl>
-                                <Input placeholder='Votre numéro' {...field} />
+                                <Input
+                                  placeholder='Sujet de votre message'
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                      </div>
-                      <FormField
-                        control={recruitmentForm.control}
-                        name='position'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Poste recherché</FormLabel>
-                            <FormControl>
-                              <Select
-                                onValueChange={handlePositionChange}
-                                value={field.value}
-                              >
-                                <SelectTrigger>
-                                  {field.value || 'Sélectionnez un poste'}
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {loadingJobs ? (
-                                    <SelectItem value='loading' disabled>
-                                      Chargement des postes...
-                                    </SelectItem>
-                                  ) : (
-                                    <>
-                                      {jobs
-                                        .filter(job => job.title) // Filtre les titres vides ou indéfinis
-                                        .map(job => (
-                                          <SelectItem
-                                            key={job.id}
-                                            value={job.title}
-                                          >
-                                            {job.title}
-                                          </SelectItem>
-                                        ))}
-                                      <SelectItem value='Candidature spontanée'>
-                                        Candidature spontanée
-                                      </SelectItem>
-                                    </>
-                                  )}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={recruitmentForm.control}
-                        name='experience'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Expérience professionnelle</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder='Décrivez votre expérience'
-                                className='min-h-[100px]'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={recruitmentForm.control}
-                        name='motivation'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Lettre de motivation</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder='Pourquoi souhaitez-vous nous rejoindre ?'
-                                className='min-h-[120px]'
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type='submit' className='w-full'>
-                        Envoyer ma candidature
-                      </Button>
-                    </form>
-                  </Form>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                        <FormField
+                          control={contactForm.control}
+                          name='message'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Message</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder='Votre message'
+                                  className='min-h-[120px]'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button type='submit' className='w-full'>
+                          Envoyer
+                        </Button>
+                      </form>
+                    </Form>
+                  </TabsContent>
 
-      <Footer />
-    </div>
+                  {/* Complaint Form */}
+                  <TabsContent value='complaint'>
+                    <Form {...complaintForm}>
+                      <form
+                        onSubmit={complaintForm.handleSubmit(data =>
+                          onSubmit(data, 'complaint')
+                        )}
+                        className='space-y-6'
+                      >
+                        <FormField
+                          control={complaintForm.control}
+                          name='name'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nom complet</FormLabel>
+                              <FormControl>
+                                <Input placeholder='Votre nom' {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={complaintForm.control}
+                          name='email'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type='email'
+                                  placeholder='votre@email.com'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={complaintForm.control}
+                          name='serviceType'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Service concerné</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Ex: Centre de santé, Med'event..."
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={complaintForm.control}
+                          name='complaintDetails'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Détails de la réclamation</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder='Décrivez votre réclamation'
+                                  className='min-h-[120px]'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button type='submit' className='w-full'>
+                          Envoyer la réclamation
+                        </Button>
+                      </form>
+                    </Form>
+                  </TabsContent>
+
+                  {/* Recruitment Form */}
+                  <TabsContent value='recruitment'>
+                    <Form {...recruitmentForm}>
+                      <form
+                        onSubmit={recruitmentForm.handleSubmit(data =>
+                          onSubmit(data, 'recruitment')
+                        )}
+                        className='space-y-6'
+                      >
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                          <FormField
+                            control={recruitmentForm.control}
+                            name='firstName'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Prénom</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder='Votre prénom'
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={recruitmentForm.control}
+                            name='lastName'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Nom</FormLabel>
+                                <FormControl>
+                                  <Input placeholder='Votre nom' {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                          <FormField
+                            control={recruitmentForm.control}
+                            name='email'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type='email'
+                                    placeholder='votre@email.com'
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={recruitmentForm.control}
+                            name='phone'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Téléphone</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder='Votre numéro'
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <FormField
+                          control={recruitmentForm.control}
+                          name='position'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Poste recherché</FormLabel>
+                              <FormControl>
+                                <Select
+                                  onValueChange={handlePositionChange}
+                                  value={field.value}
+                                >
+                                  <SelectTrigger>
+                                    {field.value || 'Sélectionnez un poste'}
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {loadingJobs ? (
+                                      <SelectItem value='loading' disabled>
+                                        Chargement des postes...
+                                      </SelectItem>
+                                    ) : (
+                                      <>
+                                        {jobs
+                                          .filter(job => job.title) // Filtre les titres vides ou indéfinis
+                                          .map(job => (
+                                            <SelectItem
+                                              key={job.id}
+                                              value={job.title}
+                                            >
+                                              {job.title}
+                                            </SelectItem>
+                                          ))}
+                                        <SelectItem value='Candidature spontanée'>
+                                          Candidature spontanée
+                                        </SelectItem>
+                                      </>
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={recruitmentForm.control}
+                          name='experience'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Expérience professionnelle</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder='Décrivez votre expérience'
+                                  className='min-h-[100px]'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={recruitmentForm.control}
+                          name='motivation'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Lettre de motivation</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder='Pourquoi souhaitez-vous nous rejoindre ?'
+                                  className='min-h-[120px]'
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button type='submit' className='w-full'>
+                          Envoyer ma candidature
+                        </Button>
+                      </form>
+                    </Form>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    </>
   )
 }
 

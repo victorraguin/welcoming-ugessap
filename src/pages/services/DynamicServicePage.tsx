@@ -1,3 +1,4 @@
+// src/pages/services/DynamicServicePage.tsx
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useParams } from 'react-router-dom'
 import ServicePage from '@/components/services/ServicePage'
@@ -5,6 +6,7 @@ import { useServices } from '@/hooks/useServices'
 import { Service } from '@/types/service'
 import { useEffect } from 'react'
 import Loader from '@/components/Loader'
+import { Helmet } from 'react-helmet-async'
 
 function DynamicServicePage () {
   const { slug } = useParams()
@@ -12,7 +14,7 @@ function DynamicServicePage () {
 
   useEffect(() => {
     fetchServices()
-  }, [])
+  }, [fetchServices])
 
   if (isLoading) return <Loader />
   if (isError)
@@ -24,7 +26,18 @@ function DynamicServicePage () {
     return <p>Le service demandé est introuvable.</p>
   }
 
-  return <ServicePage service={service} />
+  return (
+    <>
+      <Helmet>
+        <title>UGESSAP - Nos services</title>
+        <meta name='description' content='Bienvenue sur UGESSAP. ' />
+        <meta property='og:title' content='UGESSAP - Nos services' />
+        <meta property='og:description' content='Bienvenue sur UGESSAP.' />
+        <meta property='og:image' content={'/ugessap-default-image.png'} />
+      </Helmet>
+      <ServicePage service={service} />
+    </>
+  )
 }
 
 export default DynamicServicePage

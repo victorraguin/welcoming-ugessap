@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom'
 import { Service } from '@/types/service'
 import { useServices } from '@/hooks/useServices'
 import ServicesSection from '@/components/Services'
+import { Helmet } from 'react-helmet-async'
 
 // Types pour TypeScript (optionnel)
 interface AssociationRecord {
@@ -149,184 +150,195 @@ const Association = () => {
   } = association
 
   return (
-    <div className='min-h-screen flex flex-col'>
-      <Navbar />
+    <>
+      <Helmet>
+        <title>UGESSAP - L'association</title>
+        <meta name='description' content='Bienvenue sur UGESSAP.' />
+        <meta property='og:title' content='UGESSAP - Association' />
+        <meta property='og:description' content='Bienvenue sur UGESSAP.' />
+        <meta property='og:image' content='/ugessap-og-image.png' />
+      </Helmet>
+      <div className='min-h-screen flex flex-col'>
+        <Navbar />
 
-      <main className='flex-1'>
-        {/* Hero Section */}
-        <section className='bg-primary/5 py-20 md:py-24'>
-          <div className='container mx-auto px-4'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
-              <div>
-                <h1 className='text-4xl md:text-5xl font-bold mb-6 slide-up'>
-                  {name}
-                </h1>
-                <p className='text-lg text-gray-600 mb-8 slide-up'>
-                  {short_description}
-                </p>
-              </div>
-              {/* Image illustrant l’association (à adapter selon vos besoins) */}
-              <div className='relative'>
-                <img
-                  src={logo}
-                  alt={name}
-                  className='rounded-lg shadow-xl w-full fade-in'
-                />
+        <main className='flex-1'>
+          {/* Hero Section */}
+          <section className='bg-primary/5 py-20 md:py-24'>
+            <div className='container mx-auto px-4'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
+                <div>
+                  <h1 className='text-4xl md:text-5xl font-bold mb-6 slide-up'>
+                    {name}
+                  </h1>
+                  <p className='text-lg text-gray-600 mb-8 slide-up'>
+                    {short_description}
+                  </p>
+                </div>
+                {/* Image illustrant l’association (à adapter selon vos besoins) */}
+                <div className='relative'>
+                  <img
+                    src={logo}
+                    alt={name}
+                    className='rounded-lg shadow-xl w-full fade-in'
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Mission Section */}
-        <section className='py-16 bg-white'>
-          <div className='container mx-auto px-4'>
-            <h2 className='text-3xl font-bold text-center mb-12'>
-              Notre Mission
-            </h2>
-            <div className='max-w-4xl mx-auto space-y-6 text-gray-600'>
-              <div
-                className='text-lg'
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(association?.description || '')
-                }}
-              ></div>
-            </div>
-          </div>
-        </section>
-
-        {/* Services */}
-        <ServicesSection />
-
-        {/* Points clés */}
-        {key_points.length > 0 && (
-          <section className='py-16'>
+          {/* Mission Section */}
+          <section className='py-16 bg-white'>
             <div className='container mx-auto px-4'>
               <h2 className='text-3xl font-bold text-center mb-12'>
-                Nos points clés
+                Notre Mission
               </h2>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-                {key_points.map((point, idx) => {
-                  const IconComponent =
-                    iconsMap[point.icon as keyof typeof iconsMap] || Building2
-                  return (
-                    <Card key={idx} className='card-hover'>
-                      <CardContent className='p-6'>
-                        <IconComponent className='w-12 h-12 text-primary mb-4' />
-                        <h3 className='text-xl font-semibold mb-2'>
-                          {point.title}
+              <div className='max-w-4xl mx-auto space-y-6 text-gray-600'>
+                <div
+                  className='text-lg'
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(association?.description || '')
+                  }}
+                ></div>
+              </div>
+            </div>
+          </section>
+
+          {/* Services */}
+          <ServicesSection />
+
+          {/* Points clés */}
+          {key_points.length > 0 && (
+            <section className='py-16'>
+              <div className='container mx-auto px-4'>
+                <h2 className='text-3xl font-bold text-center mb-12'>
+                  Nos points clés
+                </h2>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+                  {key_points.map((point, idx) => {
+                    const IconComponent =
+                      iconsMap[point.icon as keyof typeof iconsMap] || Building2
+                    return (
+                      <Card key={idx} className='card-hover'>
+                        <CardContent className='p-6'>
+                          <IconComponent className='w-12 h-12 text-primary mb-4' />
+                          <h3 className='text-xl font-semibold mb-2'>
+                            {point.title}
+                          </h3>
+                          <p className='text-gray-600'>{point.description}</p>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Équipe */}
+          {team.length > 0 && (
+            <section className='py-16 bg-gray-50'>
+              <div className='container mx-auto px-4'>
+                <h2 className='text-3xl font-bold text-center mb-12'>
+                  Notre Équipe
+                </h2>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+                  {team.map(member => (
+                    <Card key={member.id} className='card-hover'>
+                      <CardContent className='p-6 text-center'>
+                        <Avatar className='w-24 h-24 mx-auto mb-4'>
+                          <AvatarImage
+                            src={member.image}
+                            alt={member.person_name}
+                          />
+                          <AvatarFallback>
+                            {member.person_name
+                              .split(' ')
+                              .map(n => n[0])
+                              .join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <h3 className='text-xl font-semibold mb-1'>
+                          {member.person_name}
                         </h3>
-                        <p className='text-gray-600'>{point.description}</p>
+                        <p className='text-primary font-medium mb-2'>
+                          {member.job_title}
+                        </p>
                       </CardContent>
                     </Card>
-                  )
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>
-        )}
+            </section>
+          )}
 
-        {/* Équipe */}
-        {team.length > 0 && (
-          <section className='py-16 bg-gray-50'>
-            <div className='container mx-auto px-4'>
-              <h2 className='text-3xl font-bold text-center mb-12'>
-                Notre Équipe
-              </h2>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-                {team.map(member => (
-                  <Card key={member.id} className='card-hover'>
-                    <CardContent className='p-6 text-center'>
-                      <Avatar className='w-24 h-24 mx-auto mb-4'>
-                        <AvatarImage
-                          src={member.image}
-                          alt={member.person_name}
-                        />
-                        <AvatarFallback>
-                          {member.person_name
-                            .split(' ')
-                            .map(n => n[0])
-                            .join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <h3 className='text-xl font-semibold mb-1'>
-                        {member.person_name}
-                      </h3>
-                      <p className='text-primary font-medium mb-2'>
-                        {member.job_title}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
+          {/* Partenaires */}
+          {partners.length > 0 && (
+            <section className='bg-gray-50 py-16'>
+              <div className='container mx-auto px-4'>
+                <h2 className='text-3xl font-bold text-center mb-12'>
+                  Nos partenaires
+                </h2>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+                  {partners.map((partner, index) => (
+                    <Card key={index} className='card-hover'>
+                      <CardContent className='p-6 text-center'>
+                        {partner.logoUrl && (
+                          <img
+                            src={partner.logoUrl}
+                            alt={partner.name}
+                            className='w-24 h-24 object-contain mx-auto mb-4'
+                          />
+                        )}
+                        <h3 className='text-xl font-semibold mb-2'>
+                          {partner.name}
+                        </h3>
+                        <p className='text-gray-600'>{partner.description}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>
-        )}
+            </section>
+          )}
 
-        {/* Partenaires */}
-        {partners.length > 0 && (
-          <section className='bg-gray-50 py-16'>
-            <div className='container mx-auto px-4'>
-              <h2 className='text-3xl font-bold text-center mb-12'>
-                Nos partenaires
-              </h2>
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-                {partners.map((partner, index) => (
-                  <Card key={index} className='card-hover'>
-                    <CardContent className='p-6 text-center'>
-                      {partner.logoUrl && (
-                        <img
-                          src={partner.logoUrl}
-                          alt={partner.name}
-                          className='w-24 h-24 object-contain mx-auto mb-4'
-                        />
-                      )}
-                      <h3 className='text-xl font-semibold mb-2'>
-                        {partner.name}
-                      </h3>
-                      <p className='text-gray-600'>{partner.description}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Recrutement */}
-        {/* On n’affiche cette section que si is_open_for_recruitment === true */}
-        {is_open_for_recruitment && jobs.length > 0 && (
-          <section className='py-16'>
-            <div className='container mx-auto px-4'>
-              <h2 className='text-3xl font-bold text-center mb-12'>
-                Nous recrutons
-              </h2>
-              <div className='max-w-2xl mx-auto'>
-                {jobs.map(job => (
-                  <Card key={job.id} className='mb-4 card-hover'>
-                    <CardContent className='p-6'>
-                      <div className='flex flex-col md:flex-row md:justify-between md:items-center'>
-                        <div className='mb-4 md:mb-0'>
-                          <h3 className='text-xl font-semibold'>{job.title}</h3>
-                          <p className='text-gray-600'>{job.description}</p>
+          {/* Recrutement */}
+          {/* On n’affiche cette section que si is_open_for_recruitment === true */}
+          {is_open_for_recruitment && jobs.length > 0 && (
+            <section className='py-16'>
+              <div className='container mx-auto px-4'>
+                <h2 className='text-3xl font-bold text-center mb-12'>
+                  Nous recrutons
+                </h2>
+                <div className='max-w-2xl mx-auto'>
+                  {jobs.map(job => (
+                    <Card key={job.id} className='mb-4 card-hover'>
+                      <CardContent className='p-6'>
+                        <div className='flex flex-col md:flex-row md:justify-between md:items-center'>
+                          <div className='mb-4 md:mb-0'>
+                            <h3 className='text-xl font-semibold'>
+                              {job.title}
+                            </h3>
+                            <p className='text-gray-600'>{job.description}</p>
+                          </div>
+                          <Link
+                            to={`/contact?tab=recruitment&position=${job.title}`}
+                            className='text-primary hover:underline mt-4 md:mt-0 md:ml-4'
+                          >
+                            Postuler
+                          </Link>
                         </div>
-                        <Link
-                          to={`/contact?tab=recruitment&position=${job.title}`}
-                          className='text-primary hover:underline mt-4 md:mt-0 md:ml-4'
-                        >
-                          Postuler
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>
-        )}
-      </main>
+            </section>
+          )}
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   )
 }
 
