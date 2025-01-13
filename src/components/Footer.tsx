@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Link } from 'react-router-dom'
-import { Phone, Mail, MapPin } from 'lucide-react'
 import { Service } from '@/types/service'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/integrations/supabase/client'
@@ -14,10 +14,10 @@ interface Association {
 const Footer = () => {
   const [association, setAssociation] = useState<Association | null>(null)
 
-  const { services, isLoading, isError, fetchServices } = useServices()
+  const { services, fetchServices } = useServices()
 
   useEffect(() => {
-    fetchServices() // Assurez-vous de charger les services au montage
+    fetchServices()
   }, [])
 
   useEffect(() => {
@@ -36,8 +36,6 @@ const Footer = () => {
 
     fetchAssociationData()
   }, [])
-
-  console.log('services', services)
 
   return (
     <footer className='bg-gray-900 text-gray-300'>

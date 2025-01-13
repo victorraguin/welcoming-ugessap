@@ -32,7 +32,6 @@ const Testimonials = () => {
     fetchTestimonials()
   }, [])
 
-  console.log('testimonials', testimonials)
   if (testimonials.length === 0) return null
 
   return (

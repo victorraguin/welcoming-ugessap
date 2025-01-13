@@ -22,7 +22,6 @@ interface TeamMember {
   person_name: string
   job_title: string
   service_id: string
-  // ajoutez d'autres champs si besoin
 }
 
 interface ServicePageProps {
@@ -30,15 +29,12 @@ interface ServicePageProps {
 }
 
 const ServicePage = ({ service }: ServicePageProps) => {
-  // État pour stocker l'équipe
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [loadingTeam, setLoadingTeam] = useState(true)
   const [errorTeam, setErrorTeam] = useState<string | null>(null)
 
-  // Récupère l’icône Lucide
   const IconComponent = Icons[service.icon] || Icons.HelpCircle
 
-  // Effect : récupère l’équipe liée au service_id
   useEffect(() => {
     async function fetchTeam () {
       try {
@@ -48,7 +44,7 @@ const ServicePage = ({ service }: ServicePageProps) => {
         const { data, error } = await supabase
           .from('team')
           .select('*')
-          .eq('service_id', service.id) // Filtre sur le service_id
+          .eq('service_id', service.id)
 
         if (error) {
           throw error
@@ -57,22 +53,18 @@ const ServicePage = ({ service }: ServicePageProps) => {
         if (data) {
           setTeamMembers(data)
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err)
-        setErrorTeam(err.message)
+        setErrorTeam((err as Error).message)
       } finally {
         setLoadingTeam(false)
       }
     }
 
-    // Si on a un service.id, on lance la requête
     if (service.id) {
       fetchTeam()
     }
   }, [service.id])
-
-  console.log('service', service)
-  console.log('teamMembers', teamMembers)
 
   return (
     <div className='min-h-screen flex flex-col'>
@@ -314,54 +306,6 @@ const ServicePage = ({ service }: ServicePageProps) => {
             </div>
           </section>
         )}
-        {/* Adresse et Horaires
-        {(service.address || service.hours) && (
-          <section className='py-16 bg-white'>
-            <div className='container mx-auto px-4'>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto'>
-                {service.address && (
-                  <div className='text-center'>
-                    <h2 className='text-3xl font-bold mb-8'>Notre adresse</h2>
-                    <p className='text-lg text-gray-600'>
-                      {service.address.street}
-                      <br />
-                      {service.address.postalCode} {service.address.city}
-                    </p>
-                  </div>
-                )}
-
-                {service.hours && (
-                  <div className='text-center'>
-                    <h2 className='text-3xl font-bold mb-8'>Nos horaires</h2>
-                    <div className='space-y-2 text-lg text-gray-600'>
-                      {service.hours.monday && (
-                        <p>Lundi : {service.hours.monday}</p>
-                      )}
-                      {service.hours.tuesday && (
-                        <p>Mardi : {service.hours.tuesday}</p>
-                      )}
-                      {service.hours.wednesday && (
-                        <p>Mercredi : {service.hours.wednesday}</p>
-                      )}
-                      {service.hours.thursday && (
-                        <p>Jeudi : {service.hours.thursday}</p>
-                      )}
-                      {service.hours.friday && (
-                        <p>Vendredi : {service.hours.friday}</p>
-                      )}
-                      {service.hours.saturday && (
-                        <p>Samedi : {service.hours.saturday}</p>
-                      )}
-                      {service.hours.sunday && (
-                        <p>Dimanche : {service.hours.sunday}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        )} */}
       </main>
 
       <Footer />

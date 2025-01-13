@@ -63,8 +63,6 @@ const RecruitmentEditor = () => {
     fetchRecruitmentData()
   }, [])
 
-  console.log('recruitment data', isRecruiting, jobPostings)
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {

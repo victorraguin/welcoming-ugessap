@@ -30,13 +30,21 @@ const ReviewsPage = () => {
         if (error) throw error
 
         if (data) {
-          const formattedReviews = data.map((review: any) => ({
-            id: review.id,
-            title: review.title || '',
-            date: review.review_date || '',
-            stars: review.stars || 5,
-            description: review.description || ''
-          }))
+          const formattedReviews = data.map(
+            (review: {
+              id: string
+              title: string
+              review_date: string
+              stars: number
+              description: string
+            }) => ({
+              id: review.id,
+              title: review.title || '',
+              date: review.review_date || '',
+              stars: review.stars || 5,
+              description: review.description || ''
+            })
+          )
           setReviews(formattedReviews)
         }
       } catch (error) {

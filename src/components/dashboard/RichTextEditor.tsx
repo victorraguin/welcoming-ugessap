@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useRef, useEffect } from 'react'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'

@@ -1,4 +1,4 @@
-import { QueryClient, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { Service } from '@/types/service'
@@ -13,7 +13,7 @@ export const useServices = () => {
   const QueryClient = useQueryClient()
 
   const fetchServices = async () => {
-    setIsLoading(true) // Activer le chargement au début
+    setIsLoading(true)
     try {
       const { data: session, error: sessionError } =
         await supabase.auth.getSession()
@@ -33,7 +33,6 @@ export const useServices = () => {
         .order('order_index', { ascending: true })
 
       if (error) throw error
-      console.log('Data:', data)
 
       const formattedServices = data.map(transformServiceFromDb)
       setServices(formattedServices)
@@ -42,7 +41,7 @@ export const useServices = () => {
       toast.error('Erreur lors du chargement des services')
       setIsError(true)
     } finally {
-      setIsLoading(false) // Toujours désactiver le chargement
+      setIsLoading(false)
     }
   }
 
@@ -98,9 +97,7 @@ export const useServices = () => {
         throw error
       }
 
-      // setServices(services.filter(service => service.id !== id))
       toast.success('Service supprimé avec succès')
-      // Synchroniser les services après suppression
       QueryClient.invalidateQueries({ queryKey: ['services'] })
       await fetchServices()
     } catch (error) {
@@ -110,7 +107,11 @@ export const useServices = () => {
     }
   }
 
-  const updateService = (id: string, field: keyof Service, value: any) => {
+  const updateService = (
+    id: string,
+    field: keyof Service,
+    value: string | number | boolean | object
+  ) => {
     setServices(prevServices =>
       prevServices.map(service =>
         service.id === id ? { ...service, [field]: value } : service
@@ -123,13 +124,11 @@ export const useServices = () => {
     buttons: Service['buttons']
   ) => {
     try {
-      // First, delete all existing buttons for this service
       await supabase
         .from('service_buttons')
         .delete()
         .eq('service_id', serviceId)
 
-      // Then, insert all new buttons
       if (buttons.length > 0) {
         const buttonsData = buttons.map((button, index) => ({
           service_id: serviceId,

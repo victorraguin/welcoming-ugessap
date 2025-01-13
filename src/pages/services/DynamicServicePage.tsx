@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useParams } from 'react-router-dom'
 import ServicePage from '@/components/services/ServicePage'
 import { useServices } from '@/hooks/useServices'
-import { Service, ServiceData } from '@/types/service'
+import { Service } from '@/types/service'
 import { useEffect } from 'react'
 import Loader from '@/components/Loader'
 
@@ -13,23 +14,16 @@ function DynamicServicePage () {
     fetchServices()
   }, [])
 
-  console.log('slug', slug)
-  console.log('services', services)
-
-  // Pendant le chargement ou s'il y a une erreur
   if (isLoading) return <Loader />
   if (isError)
     return <p>Une erreur est survenue lors du chargement des services.</p>
 
-  // Trouver le service correspondant au slug
   const service: Service | undefined = services.find(s => s.slug === slug)
 
-  // Gérer le cas où aucun service ne correspond au slug
   if (!service) {
     return <p>Le service demandé est introuvable.</p>
   }
 
-  // Rendre le composant de service avec les données
   return <ServicePage service={service} />
 }
 

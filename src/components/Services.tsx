@@ -1,9 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/integrations/supabase/client'
 import * as LucideIcons from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowRight, LucideProps } from 'lucide-react'
@@ -15,10 +14,9 @@ const ServicesSection = () => {
   const { services, isLoading, isError, fetchServices } = useServices()
 
   useEffect(() => {
-    fetchServices() // Assurez-vous de charger les services au montage
+    fetchServices()
   }, [])
 
-  console.log('Supabase raw data:', services)
   if (isError) {
     console.error('Error loading services')
     toast.error('Erreur lors du chargement des service')

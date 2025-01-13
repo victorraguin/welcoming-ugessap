@@ -73,18 +73,26 @@ export default function TeamEditor () {
         if (error) throw error
 
         if (data) {
-          const members = data.map((member: any) => ({
-            id: member.id,
-            name: member.person_name,
-            role: member.job_title,
-            service:
-              Object.keys(servicesMap).find(
-                key => servicesMap[key] === member.service_id
-              ) ||
-              servicesList[0] ||
-              'Service inconnu',
-            photoUrl: member.image || 'https://placehold.co/128'
-          }))
+          const members = data.map(
+            (member: {
+              id: string
+              person_name: string
+              job_title: string
+              service_id: string
+              image: string
+            }) => ({
+              id: member.id,
+              name: member.person_name,
+              role: member.job_title,
+              service:
+                Object.keys(servicesMap).find(
+                  key => servicesMap[key] === member.service_id
+                ) ||
+                servicesList[0] ||
+                'Service inconnu',
+              photoUrl: member.image || 'https://placehold.co/128'
+            })
+          )
           setTeamMembers(members)
         }
       } catch (err) {
@@ -169,15 +177,17 @@ export default function TeamEditor () {
       if (rowsToInsert.length > 0) {
         const { error: upsertError } = await supabase
           .from('team')
-          .upsert(rowsToInsert, { onConflict: ['id'] })
+          .upsert(rowsToInsert, { onConflict: 'id' })
 
         if (upsertError) throw upsertError
       }
 
       toast.success('Équipe mise à jour avec succès')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving team data:', error)
-      toast.error(`Erreur lors de la mise à jour de l'équipe: ${error.message}`)
+      toast.error(
+        `Erreur lors de la mise à jour de l'équipe: ${(error as Error).message}`
+      )
     }
   }
 

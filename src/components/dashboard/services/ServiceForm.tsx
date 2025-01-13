@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Eye, EyeOff, Plus, X } from 'lucide-react'
+import { Eye, EyeOff, X } from 'lucide-react'
 import { useState } from 'react'
 import { ServiceKeyPoints } from './ServiceKeyPoints'
 import { ServiceImages } from './ServiceImages'
@@ -14,7 +14,11 @@ import { Service } from '@/types/service'
 
 interface ServiceFormProps {
   service: Service
-  onUpdate: (id: string, field: keyof Service, value: any) => void
+  onUpdate: (
+    id: string,
+    field: keyof Service,
+    value: string | number | boolean | object
+  ) => void
   onRemove: (id: string) => void
 }
 

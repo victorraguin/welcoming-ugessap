@@ -28,11 +28,13 @@ const ImagesPage = () => {
         if (error) throw error
 
         if (data) {
-          const formattedImages = data.map((image: any) => ({
-            id: image.id,
-            url: image.url || '/placeholder.svg',
-            alt: image.alt || 'Image sans description'
-          }))
+          const formattedImages = data.map(
+            (image: { id: string; url?: string; alt?: string }) => ({
+              id: image.id,
+              url: image.url || '/placeholder.svg',
+              alt: image.alt || 'Image sans description'
+            })
+          )
           setImages(formattedImages)
         }
       } catch (error) {
@@ -46,7 +48,6 @@ const ImagesPage = () => {
     fetchImages()
   }, [])
 
-  // Ajouter une nouvelle image
   const addImage = () => {
     const newImage: CarouselImage = {
       id: crypto.randomUUID(),
@@ -56,12 +57,9 @@ const ImagesPage = () => {
     setImages([...images, newImage])
   }
 
-  // Supprimer une image
   const removeImage = (id: string) => {
     setImages(images.filter(image => image.id !== id))
   }
-
-  // Mettre à jour une image
   const updateImage = (
     id: string,
     field: keyof CarouselImage,
@@ -74,19 +72,16 @@ const ImagesPage = () => {
     )
   }
 
-  // Enregistrer les modifications
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     try {
-      // Supprimer les images existantes en base
       const { error: deleteError } = await supabase
         .from('images')
         .delete()
         .not('id', 'is', null)
       if (deleteError) throw deleteError
 
-      // Ajouter les nouvelles images
       if (images.length > 0) {
         const { error: insertError } = await supabase.from('images').insert(
           images.map(image => ({

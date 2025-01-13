@@ -141,21 +141,6 @@ const AssociationEditor = () => {
         icon_name: point.iconName
       })) as Json[]
 
-      console.log({
-        name: associationData.name,
-        description: associationData.longDescription,
-        short_description: associationData.shortDescription,
-        logo: associationData.logoUrl,
-        partners: partners.map(partner => ({
-          ...partner,
-          logo_url: partner.logoUrl
-        })),
-        key_points: keyPoints.map(point => ({
-          ...point,
-          icon_name: point.iconName
-        }))
-      })
-
       const { error } = await supabase
         .from('association')
         .update({
@@ -175,8 +160,6 @@ const AssociationEditor = () => {
       toast.error("Erreur lors de l'enregistrement des modifications")
     }
   }
-
-  console.log('association editor', associationData)
 
   return (
     <>

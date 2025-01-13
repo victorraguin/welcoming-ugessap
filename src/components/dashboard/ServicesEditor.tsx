@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
@@ -7,7 +8,6 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
-import { useQueryClient } from '@tanstack/react-query'
 
 const ServicesEditor = () => {
   const navigate = useNavigate()
@@ -20,8 +20,6 @@ const ServicesEditor = () => {
     updateService,
     handleButtonsUpdate
   } = useServices()
-
-  console.log('services editor', services)
 
   useEffect(() => {
     // Check authentication status

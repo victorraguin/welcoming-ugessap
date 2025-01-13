@@ -59,7 +59,6 @@ const Contact = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Tabs logic
   const params = new URLSearchParams(location.search)
   const currentTab = params.get('tab') || 'contact'
   const selectedPosition = params.get('position') || 'Candidature spontanée'
@@ -68,7 +67,6 @@ const Contact = () => {
     navigate(`?tab=${tab}`)
   }
 
-  // Jobs state
   const [jobs, setJobs] = useState<Job[]>([])
   const [loadingJobs, setLoadingJobs] = useState(true)
 
@@ -99,7 +97,10 @@ const Contact = () => {
     }
   })
 
-  const onSubmit = (data: any, type: string) => {
+  const onSubmit = (
+    data: ContactFormData | ComplaintFormData | RecruitmentFormData,
+    type: string
+  ) => {
     const messages = {
       contact: {
         title: 'Message envoyé',
