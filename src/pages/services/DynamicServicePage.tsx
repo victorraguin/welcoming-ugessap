@@ -14,7 +14,7 @@ function DynamicServicePage () {
 
   useEffect(() => {
     fetchServices()
-  }, [fetchServices])
+  }, [])
 
   if (isLoading) return <Loader />
   if (isError)
