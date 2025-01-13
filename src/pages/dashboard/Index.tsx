@@ -1,7 +1,7 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar'
 import { Card, CardContent } from '@/components/ui/card'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Building2,
   Users,
@@ -9,8 +9,10 @@ import {
   LayoutGrid,
   Image,
   MessageSquare,
-  Settings
+  Settings,
+  LogOut
 } from 'lucide-react'
+import { supabase } from '@/integrations/supabase/client' // Assurez-vous que cette importation est correcte
 
 const menuItems = [
   {
@@ -58,13 +60,30 @@ const menuItems = [
 ]
 
 const DashboardIndex = () => {
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut() // Déconnecte l'utilisateur
+    localStorage.clear() // Supprime toutes les données du local storage
+    navigate('/') // Redirige vers la page d'accueil
+  }
+
   return (
     <SidebarProvider>
       <div className='min-h-screen flex w-full'>
         <DashboardSidebar />
         <main className='flex-1 p-8 bg-gray-50'>
           <div className='max-w-7xl mx-auto'>
-            <h1 className='text-3xl font-bold mb-8'>Tableau de bord</h1>
+            <div className='flex justify-between items-center mb-8'>
+              <h1 className='text-3xl font-bold'>Tableau de bord</h1>
+              <button
+                onClick={handleLogout}
+                className='bg-orange-400 text-white px-4 py-2 rounded-md hover:bg-orange-500 transition-colors'
+              >
+                <LogOut className='inline-block mr-2 w-5 h-5' />
+                Déconnexion
+              </button>
+            </div>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               {menuItems.map(item => (
                 <Link key={item.title} to={item.url}>

@@ -25,28 +25,30 @@ function App () {
       <HelmetProvider>
         <Router>
           <ScrollToTop />
-          <Routes>
-            <Route path='/' element={<Index />} />
-            <Route path='/association' element={<Association />} />
-            <Route path='/contact' element={<Contact />} />
-            {/* Route dynamique pour tous les services : */}
-            <Route path='/services/:slug' element={<DynamicServicePage />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/dashboard' element={<DashboardIndex />} />
-            <Route
-              path='/dashboard/association'
-              element={<AssociationPage />}
-            />
-            <Route path='/dashboard/services' element={<ServicesPage />} />
-            <Route path='/dashboard/images' element={<ImagesPage />} />
-            <Route path='/dashboard/reviews' element={<ReviewsPage />} />
-            <Route path='/dashboard/team' element={<TeamPage />} />
-            <Route
-              path='/dashboard/recruitment'
-              element={<RecruitmentPage />}
-            />
-            <Route path='/dashboard/settings' element={<Settings />} />
-          </Routes>
+          <HelmetProvider>
+            <Routes>
+              <Route path='/' element={<Index />} />
+              <Route path='/association' element={<Association />} />
+              <Route path='/contact' element={<Contact />} />
+              {/* Route dynamique pour tous les services : */}
+              <Route path='/services/:slug' element={<DynamicServicePage />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/dashboard' element={<DashboardIndex />} />
+              <Route
+                path='/dashboard/association'
+                element={<AssociationPage />}
+              />
+              <Route path='/dashboard/services' element={<ServicesPage />} />
+              <Route path='/dashboard/images' element={<ImagesPage />} />
+              <Route path='/dashboard/reviews' element={<ReviewsPage />} />
+              <Route path='/dashboard/team' element={<TeamPage />} />
+              <Route
+                path='/dashboard/recruitment'
+                element={<RecruitmentPage />}
+              />
+              <Route path='/dashboard/settings' element={<Settings />} />
+            </Routes>
+          </HelmetProvider>
         </Router>
       </HelmetProvider>
     </QueryClientProvider>
