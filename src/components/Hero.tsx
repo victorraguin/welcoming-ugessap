@@ -79,7 +79,10 @@ const Hero = () => {
               variant='outline'
               size='lg'
               className='w-full sm:w-auto text-base bg-white/10 hover:bg-white/20 text-white border-white/20'
-              onClick={() => handleSmoothScroll('#mission')} // Smooth scroll vers #about
+              onClick={() =>
+                // link to /association page
+                (window.location.href = '/association')
+              } // Smooth scroll vers #about
             >
               En savoir plus
             </Button>

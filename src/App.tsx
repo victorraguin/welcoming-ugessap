@@ -3,9 +3,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Index from '@/pages/Index'
 import Association from '@/pages/Association'
 import Contact from '@/pages/Contact'
-import HealthCenter from '@/pages/services/HealthCenter'
-import ChildcareHealth from '@/pages/services/ChildcareHealth'
-import MedEvent from '@/pages/services/MedEvent'
 import DashboardIndex from '@/pages/dashboard/Index'
 import ImagesPage from '@/pages/dashboard/Images'
 import ReviewsPage from '@/pages/dashboard/Reviews'
@@ -16,6 +13,7 @@ import ServicesPage from '@/pages/dashboard/Services'
 import TeamPage from '@/pages/dashboard/Team'
 import Login from '@/pages/Login'
 import DynamicServicePage from './pages/services/DynamicServicePage'
+import ScrollToTop from './components/ScrollToTop'
 
 const queryClient = new QueryClient()
 queryClient.clear()
@@ -24,6 +22,7 @@ function App () {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
+        <ScrollToTop />
         <Routes>
           <Route path='/' element={<Index />} />
           <Route path='/association' element={<Association />} />

@@ -8,6 +8,9 @@ import Footer from '@/components/Footer'
 import DOMPurify from 'dompurify'
 import Loader from '@/components/Loader'
 import { Link } from 'react-router-dom'
+import { Service } from '@/types/service'
+import { useServices } from '@/hooks/useServices'
+import ServicesSection from '@/components/Services'
 
 // Types pour TypeScript (optionnel)
 interface AssociationRecord {
@@ -151,7 +154,7 @@ const Association = () => {
 
       <main className='flex-1'>
         {/* Hero Section */}
-        <section className='bg-primary/5 py-16 md:py-24'>
+        <section className='bg-primary/5 py-20 md:py-24'>
           <div className='container mx-auto px-4'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
               <div>
@@ -190,6 +193,9 @@ const Association = () => {
             </div>
           </div>
         </section>
+
+        {/* Services */}
+        <ServicesSection />
 
         {/* Points clés */}
         {key_points.length > 0 && (

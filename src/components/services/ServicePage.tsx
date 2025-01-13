@@ -72,7 +72,7 @@ const ServicePage = ({ service }: ServicePageProps) => {
 
       <main className='flex-1'>
         {/* Hero Section */}
-        <section className='bg-primary/5 py-16 md:py-24'>
+        <section className='bg-primary/5 py-20 md:py-24'>
           <div className='container mx-auto px-4'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
               <div className='space-y-6'>

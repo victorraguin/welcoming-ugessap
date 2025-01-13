@@ -131,7 +131,7 @@ const Contact = () => {
     <div className='min-h-screen flex flex-col'>
       <Navbar />
 
-      <main className='flex-grow py-16 bg-gray-50'>
+      <main className='flex-grow py-20 bg-gray-50'>
         <div className='container mx-auto px-4'>
           <h1 className='text-4xl font-bold text-center mb-12'>
             Contactez-nous
@@ -158,7 +158,7 @@ const Contact = () => {
                       onSubmit={contactForm.handleSubmit(data =>
                         onSubmit(data, 'contact')
                       )}
-                      className='space-y-6'
+                      className='space-y-6 '
                     >
                       <FormField
                         control={contactForm.control}
