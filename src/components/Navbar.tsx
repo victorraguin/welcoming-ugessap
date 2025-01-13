@@ -167,7 +167,7 @@ const Navbar = () => {
                   : services?.map(service => (
                       <Link
                         key={service.id}
-                        to={`/services/${service.id}`}
+                        to={`/services/${service.slug}`}
                         onClick={() => setIsOpen(false)}
                         className='block py-2  text-lg font-medium hover:text-primary'
                       >
