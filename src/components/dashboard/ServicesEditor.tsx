@@ -21,30 +21,6 @@ const ServicesEditor = () => {
     handleButtonsUpdate
   } = useServices()
 
-  useEffect(() => {
-    // Check authentication status
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate('/login')
-        return
-      }
-      fetchServices()
-    })
-
-    // Subscribe to auth changes
-    const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        navigate('/login')
-      }
-    })
-
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [navigate])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {

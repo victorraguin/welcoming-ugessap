@@ -15,6 +15,8 @@ import Login from '@/pages/Login'
 import DynamicServicePage from './pages/services/DynamicServicePage'
 import ScrollToTop from './components/ScrollToTop'
 import { HelmetProvider } from 'react-helmet-async'
+import PrivateRoute from './components/PrivateRoute' // Importez le composant PrivateRoute
+import ResetPassword from './pages/ResetPassword'
 
 const queryClient = new QueryClient()
 queryClient.clear()
@@ -25,14 +27,17 @@ function App () {
       <HelmetProvider>
         <Router>
           <ScrollToTop />
-          <HelmetProvider>
-            <Routes>
-              <Route path='/' element={<Index />} />
-              <Route path='/association' element={<Association />} />
-              <Route path='/contact' element={<Contact />} />
-              {/* Route dynamique pour tous les services : */}
-              <Route path='/services/:slug' element={<DynamicServicePage />} />
-              <Route path='/login' element={<Login />} />
+          <Routes>
+            {/* Routes publiques */}
+            <Route path='/' element={<Index />} />
+            <Route path='/association' element={<Association />} />
+            <Route path='/contact' element={<Contact />} />
+            <Route path='/services/:slug' element={<DynamicServicePage />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/reset-password' element={<ResetPassword />} />
+
+            {/* Routes protégées du dashboard */}
+            <Route element={<PrivateRoute />}>
               <Route path='/dashboard' element={<DashboardIndex />} />
               <Route
                 path='/dashboard/association'
@@ -47,8 +52,8 @@ function App () {
                 element={<RecruitmentPage />}
               />
               <Route path='/dashboard/settings' element={<Settings />} />
-            </Routes>
-          </HelmetProvider>
+            </Route>
+          </Routes>
         </Router>
       </HelmetProvider>
     </QueryClientProvider>
