@@ -71,8 +71,7 @@ const DashboardIndex = () => {
   return (
     <SidebarProvider>
       <div className='min-h-screen flex w-full'>
-        <DashboardSidebar />
-        <main className='flex-1 p-8 bg-gray-50'>
+        <main className='flex-1 p-8 '>
           <div className='max-w-7xl mx-auto'>
             <div className='flex justify-between items-center mb-8'>
               <h1 className='text-3xl font-bold'>Tableau de bord</h1>

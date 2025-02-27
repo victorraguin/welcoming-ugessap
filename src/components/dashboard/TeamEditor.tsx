@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
-import { Trash2 } from 'lucide-react'
+import { Trash2, ChevronDown, Plus } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -11,13 +11,28 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
+import FloatingSaveButton from '@/components/FloatingSaveButton'
 
 interface DbService {
   id: string
   title: string
+}
+
+interface DbTeamMember {
+  id: string
+  person_name: string
+  job_title: string
+  service_id: string
+  image: string
 }
 
 interface TeamMember {
@@ -29,14 +44,18 @@ interface TeamMember {
   isDeleted?: boolean // Marqueur pour suppression
 }
 
-export default function TeamEditor () {
+export default function TeamEditor (): JSX.Element {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [servicesMap, setServicesMap] = useState<Record<string, string>>({})
   const [servicesList, setServicesList] = useState<string[]>([])
+  const [initialTeamMembers, setInitialTeamMembers] = useState<TeamMember[]>([])
+  const [isModified, setIsModified] = useState<boolean>(false)
+  const [saving, setSaving] = useState<boolean>(false)
+  const [expandedServices, setExpandedServices] = useState<string[]>([])
 
   // Charger les services depuis Supabase
   useEffect(() => {
-    async function fetchServices () {
+    async function fetchServices (): Promise<void> {
       try {
         const { data, error } = await supabase
           .from('services')
@@ -64,7 +83,7 @@ export default function TeamEditor () {
 
   // Charger l'équipe depuis Supabase
   useEffect(() => {
-    async function fetchTeam () {
+    async function fetchTeam (): Promise<void> {
       try {
         const { data, error } = await supabase
           .from('team')
@@ -74,13 +93,7 @@ export default function TeamEditor () {
 
         if (data) {
           const members = data.map(
-            (member: {
-              id: string
-              person_name: string
-              job_title: string
-              service_id: string
-              image: string
-            }) => ({
+            (member: DbTeamMember): TeamMember => ({
               id: member.id,
               name: member.person_name,
               role: member.job_title,
@@ -94,6 +107,16 @@ export default function TeamEditor () {
             })
           )
           setTeamMembers(members)
+          // Stocker les membres initiaux pour comparer les changements
+          setInitialTeamMembers(JSON.parse(JSON.stringify(members)))
+
+          // Définir le premier service comme ouvert par défaut s'il y a des membres
+          if (members.length > 0) {
+            const services = [...new Set(members.map(m => m.service))]
+            if (services.length > 0) {
+              setExpandedServices([services[0]])
+            }
+          }
         }
       } catch (err) {
         console.error('Error fetching team:', err)
@@ -106,18 +129,41 @@ export default function TeamEditor () {
     }
   }, [servicesMap, servicesList])
 
-  const addTeamMember = () => {
+  // Vérifier si des modifications ont été apportées
+  useEffect(() => {
+    if (initialTeamMembers.length > 0) {
+      // Compare les membres actuels avec les membres initiaux
+      const currentMembersForComparison = teamMembers
+        .filter(member => !member.isDeleted)
+        .map(({ isDeleted, ...member }) => member)
+
+      const hasModifications =
+        JSON.stringify(currentMembersForComparison) !==
+          JSON.stringify(initialTeamMembers) ||
+        initialTeamMembers.length !==
+          teamMembers.filter(m => !m.isDeleted).length
+
+      setIsModified(hasModifications)
+    }
+  }, [teamMembers, initialTeamMembers])
+
+  const addTeamMember = (service: string): void => {
     const newMember: TeamMember = {
       id: crypto.randomUUID(),
       name: '',
       role: '',
-      service: servicesList[0] || 'Service inconnu', // Par défaut, le premier service valide
+      service: service, // Utiliser le service spécifié
       photoUrl: 'https://placehold.co/128'
     }
     setTeamMembers(prev => [...prev, newMember])
+
+    // S'assurer que l'accordéon du service est ouvert
+    if (!expandedServices.includes(service)) {
+      setExpandedServices(prev => [...prev, service])
+    }
   }
 
-  const removeTeamMember = (id: string) => {
+  const removeTeamMember = (id: string): void => {
     setTeamMembers(members =>
       members.map(member =>
         member.id === id ? { ...member, isDeleted: true } : member
@@ -129,7 +175,7 @@ export default function TeamEditor () {
     id: string,
     field: keyof TeamMember,
     value: string
-  ) => {
+  ): void => {
     setTeamMembers(members =>
       members.map(member =>
         member.id === id ? { ...member, [field]: value } : member
@@ -137,8 +183,9 @@ export default function TeamEditor () {
     )
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
+    setSaving(true)
 
     try {
       const rowsToInsert = []
@@ -183,118 +230,191 @@ export default function TeamEditor () {
       }
 
       toast.success('Équipe mise à jour avec succès')
+
+      // Mettre à jour l'état initial après sauvegarde
+      const updatedMembers = teamMembers.filter(member => !member.isDeleted)
+      setInitialTeamMembers(JSON.parse(JSON.stringify(updatedMembers)))
+      setIsModified(false)
     } catch (error: unknown) {
       console.error('Error saving team data:', error)
       toast.error(
         `Erreur lors de la mise à jour de l'équipe: ${(error as Error).message}`
       )
+    } finally {
+      setSaving(false)
     }
+  }
+
+  // Grouper les membres par service
+  const teamByService = servicesList.reduce((acc, service) => {
+    acc[service] = teamMembers.filter(
+      member => !member.isDeleted && member.service === service
+    )
+    return acc
+  }, {} as Record<string, TeamMember[]>)
+
+  const handleAccordionChange = (value: string[]) => {
+    setExpandedServices(value)
   }
 
   return (
     <>
-      <form onSubmit={handleSubmit} className='flex-1 p-6 overflow-auto'>
-        <div className='max-w-6xl mx-auto space-y-6'>
-          <div className='flex justify-between items-center'>
-            <h2 className='text-2xl font-bold'>Gestion de l'équipe</h2>
-            <Button type='button' onClick={addTeamMember}>
-              Ajouter un membre
-            </Button>
+      <form onSubmit={handleSubmit} className='flex-1 p-8 overflow-auto'>
+        <div className='mx-auto space-y-6'>
+          <div className='flex justify-between items-center mb-6'>
+            <h2 className='text-3xl font-bold'>Gestion de l'équipe</h2>
           </div>
 
-          <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-            {teamMembers
-              .filter(member => !member.isDeleted)
-              .map(member => (
-                <Card key={member.id}>
-                  <CardContent className='pt-6 space-y-4'>
-                    <div className='space-y-2'>
-                      <Label htmlFor={`photoUrl-${member.id}`}>
-                        URL de la photo
-                      </Label>
-                      <Input
-                        id={`photoUrl-${member.id}`}
-                        type='text'
-                        placeholder='https://...'
-                        value={member.photoUrl}
-                        onChange={e =>
-                          updateTeamMember(
-                            member.id,
-                            'photoUrl',
-                            e.target.value
-                          )
-                        }
-                      />
-                      {member.photoUrl && (
-                        <img
-                          src={member.photoUrl}
-                          alt={`Photo de ${member.name}`}
-                          className='w-32 h-32 object-cover rounded-lg mx-auto'
-                        />
-                      )}
-                    </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor={`name-${member.id}`}>Nom</Label>
-                      <Input
-                        id={`name-${member.id}`}
-                        value={member.name}
-                        onChange={e =>
-                          updateTeamMember(member.id, 'name', e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor={`role-${member.id}`}>Fonction</Label>
-                      <Input
-                        id={`role-${member.id}`}
-                        value={member.role}
-                        onChange={e =>
-                          updateTeamMember(member.id, 'role', e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor={`service-${member.id}`}>Service</Label>
-                      <Select
-                        value={member.service}
-                        onValueChange={value =>
-                          updateTeamMember(member.id, 'service', value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {servicesList.map(title => (
-                            <SelectItem key={title} value={title}>
-                              {title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
+          <Accordion
+            type='multiple'
+            value={expandedServices}
+            onValueChange={handleAccordionChange}
+            className='w-full space-y-4'
+          >
+            {servicesList.map(service => (
+              <AccordionItem
+                key={service}
+                value={service}
+                className='border rounded-lg overflow-hidden'
+              >
+                <AccordionTrigger className='px-4 py-3 bg-accent/20 hover:bg-accent/30'>
+                  <div className='flex justify-between items-center w-full pr-4'>
+                    <span className='text-lg font-medium'>{service}</span>
+                    <span className='text-sm text-muted-foreground'>
+                      {teamByService[service]?.length || 0} membre(s)
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className='px-4 py-2'>
+                  <div className='flex justify-end mb-4'>
                     <Button
-                      variant='destructive'
-                      size='sm'
-                      className='w-full'
-                      onClick={() => removeTeamMember(member.id)}
                       type='button'
+                      onClick={() => addTeamMember(service)}
+                      variant='outline'
+                      size='sm'
                     >
-                      <Trash2 className='w-4 h-4 mr-2' />
-                      Supprimer
+                      <Plus className='w-4 h-4 mr-2' />
+                      Ajouter un membre à {service}
                     </Button>
-                  </CardContent>
-                </Card>
-              ))}
-          </div>
+                  </div>
 
-          <Button type='submit' className='w-full'>
-            Enregistrer les modifications
-          </Button>
+                  <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+                    {teamByService[service]?.length > 0 ? (
+                      teamByService[service].map(member => (
+                        <Card key={member.id}>
+                          <CardContent className='pt-6 space-y-4'>
+                            <div className='space-y-2'>
+                              <Label htmlFor={`photoUrl-${member.id}`}>
+                                URL de la photo
+                              </Label>
+                              <Input
+                                id={`photoUrl-${member.id}`}
+                                type='text'
+                                placeholder='https://...'
+                                value={member.photoUrl}
+                                onChange={e =>
+                                  updateTeamMember(
+                                    member.id,
+                                    'photoUrl',
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              {member.photoUrl && (
+                                <img
+                                  src={member.photoUrl}
+                                  alt={`Photo de ${member.name}`}
+                                  className='w-32 h-32 object-cover rounded-lg mx-auto'
+                                />
+                              )}
+                            </div>
+
+                            <div className='space-y-2'>
+                              <Label htmlFor={`name-${member.id}`}>Nom</Label>
+                              <Input
+                                id={`name-${member.id}`}
+                                value={member.name}
+                                onChange={e =>
+                                  updateTeamMember(
+                                    member.id,
+                                    'name',
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+
+                            <div className='space-y-2'>
+                              <Label htmlFor={`role-${member.id}`}>
+                                Fonction
+                              </Label>
+                              <Input
+                                id={`role-${member.id}`}
+                                value={member.role}
+                                onChange={e =>
+                                  updateTeamMember(
+                                    member.id,
+                                    'role',
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+
+                            <div className='space-y-2'>
+                              <Label htmlFor={`service-${member.id}`}>
+                                Service
+                              </Label>
+                              <Select
+                                value={member.service}
+                                onValueChange={value =>
+                                  updateTeamMember(member.id, 'service', value)
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {servicesList.map(title => (
+                                    <SelectItem key={title} value={title}>
+                                      {title}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <Button
+                              variant='destructive'
+                              size='sm'
+                              className='w-full'
+                              onClick={() => removeTeamMember(member.id)}
+                              type='button'
+                            >
+                              <Trash2 className='w-4 h-4 mr-2' />
+                              Supprimer
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))
+                    ) : (
+                      <div className='col-span-3 py-8 text-center text-muted-foreground'>
+                        Aucun membre dans ce service.
+                      </div>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
+          {/* Bouton flottant pour enregistrer */}
+          <FloatingSaveButton
+            onClick={handleSubmit}
+            loading={saving}
+            initialModified={isModified}
+            watchDependencies={[teamMembers]}
+          />
         </div>
       </form>
       <Toaster />

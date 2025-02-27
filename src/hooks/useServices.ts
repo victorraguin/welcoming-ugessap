@@ -26,6 +26,8 @@ export const useServices = () => {
         )
         .order('order_index', { ascending: true })
 
+      console.log(data)
+
       if (error) throw error
 
       const formattedServices = data.map(transformServiceFromDb)

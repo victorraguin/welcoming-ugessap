@@ -7,6 +7,13 @@ import { ImageForm } from '@/components/dashboard/images/ImageForm'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
+import FloatingSaveButton from '@/components/FloatingSaveButton'
+
+interface ImageRecord {
+  id: string
+  url?: string | null
+  alt?: string | null
+}
 
 interface CarouselImage {
   id: string
@@ -14,13 +21,15 @@ interface CarouselImage {
   alt: string
 }
 
-const ImagesPage = () => {
+const ImagesPage = (): JSX.Element => {
   const [images, setImages] = useState<CarouselImage[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [initialImages, setInitialImages] = useState<CarouselImage[]>([])
+  const [isModified, setIsModified] = useState<boolean>(false)
 
   // Fetch des images existantes
   useEffect(() => {
-    const fetchImages = async () => {
+    const fetchImages = async (): Promise<void> => {
       setLoading(true)
       try {
         const { data, error } = await supabase.from('images').select('*')
@@ -29,13 +38,15 @@ const ImagesPage = () => {
 
         if (data) {
           const formattedImages = data.map(
-            (image: { id: string; url?: string; alt?: string }) => ({
+            (image: ImageRecord): CarouselImage => ({
               id: image.id,
               url: image.url || '/placeholder.svg',
               alt: image.alt || 'Image sans description'
             })
           )
           setImages(formattedImages)
+          // Stocker les images initiales pour comparer les changements
+          setInitialImages(JSON.parse(JSON.stringify(formattedImages)))
         }
       } catch (error) {
         console.error('Erreur lors du fetch des images :', error)
@@ -48,7 +59,19 @@ const ImagesPage = () => {
     fetchImages()
   }, [])
 
-  const addImage = () => {
+  // Vérifier si des modifications ont été apportées
+  useEffect(() => {
+    if (initialImages.length > 0) {
+      // Comparaison pour détecter les changements
+      const isChanged =
+        images.length !== initialImages.length ||
+        JSON.stringify(images) !== JSON.stringify(initialImages)
+
+      setIsModified(isChanged)
+    }
+  }, [images, initialImages])
+
+  const addImage = (): void => {
     const newImage: CarouselImage = {
       id: crypto.randomUUID(),
       url: '',
@@ -57,14 +80,15 @@ const ImagesPage = () => {
     setImages([...images, newImage])
   }
 
-  const removeImage = (id: string) => {
+  const removeImage = (id: string): void => {
     setImages(images.filter(image => image.id !== id))
   }
+
   const updateImage = (
     id: string,
     field: keyof CarouselImage,
     value: string
-  ) => {
+  ): void => {
     setImages(
       images.map(image =>
         image.id === id ? { ...image, [field]: value } : image
@@ -72,7 +96,7 @@ const ImagesPage = () => {
     )
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     setLoading(true)
     try {
@@ -94,6 +118,10 @@ const ImagesPage = () => {
       }
 
       toast.success('Images enregistrées avec succès')
+
+      // Mettre à jour l'état initial après sauvegarde
+      setInitialImages(JSON.parse(JSON.stringify(images)))
+      setIsModified(false)
     } catch (error) {
       console.error("Erreur lors de l'enregistrement des images :", error)
       toast.error("Erreur lors de l'enregistrement des images")
@@ -104,38 +132,37 @@ const ImagesPage = () => {
 
   return (
     <SidebarProvider>
-      <div className='flex h-screen bg-gray-100 w-full'>
-        <DashboardSidebar />
-        <>
-          <div className='p-6 w-full space-y-6'>
-            <div className='flex justify-between items-center'>
-              <h2 className='text-2xl font-bold'>Gestion des images</h2>
-              <Button onClick={addImage}>
-                <Plus className='mr-2 h-4 w-4' /> Ajouter une image
-              </Button>
-            </div>
+      <div className='flex h-screen w-full'>
+        <div className='p-8 w-full space-y-6 overflow-auto'>
+          <div className='flex justify-between items-center'>
+            <h2 className='text-3xl font-bold'>Gestion des images</h2>
+            <Button onClick={addImage}>
+              <Plus className='mr-2 h-4 w-4' /> Ajouter une image
+            </Button>
+          </div>
 
-            <div className='space-y-6'>
-              <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                {images.map(image => (
-                  <ImageForm
-                    key={image.id}
-                    image={image}
-                    onUpdate={updateImage}
-                    onRemove={removeImage}
-                  />
-                ))}
-              </div>
-
-              <Button type='submit' className='w-full' onClick={handleSubmit}>
-                {loading
-                  ? 'Enregistrement en cours...'
-                  : 'Enregistrer les modifications'}
-              </Button>
+          <div className='space-y-6 pb-16'>
+            <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+              {images.map(image => (
+                <ImageForm
+                  key={image.id}
+                  image={image}
+                  onUpdate={updateImage}
+                  onRemove={removeImage}
+                />
+              ))}
             </div>
           </div>
-          <Toaster />
-        </>
+
+          {/* Bouton flottant pour enregistrer */}
+          <FloatingSaveButton
+            onClick={handleSubmit}
+            loading={loading}
+            initialModified={isModified}
+            watchDependencies={[images]}
+          />
+        </div>
+        <Toaster />
       </div>
     </SidebarProvider>
   )

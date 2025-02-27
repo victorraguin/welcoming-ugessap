@@ -17,6 +17,7 @@ import ScrollToTop from './components/ScrollToTop'
 import { HelmetProvider } from 'react-helmet-async'
 import PrivateRoute from './components/PrivateRoute' // Importez le composant PrivateRoute
 import ResetPassword from './pages/ResetPassword'
+import DashboardLayout from './components/dashboard/DashboardLayout'
 
 const queryClient = new QueryClient()
 queryClient.clear()
@@ -38,20 +39,22 @@ function App () {
 
             {/* Routes protégées du dashboard */}
             <Route element={<PrivateRoute />}>
-              <Route path='/dashboard' element={<DashboardIndex />} />
-              <Route
-                path='/dashboard/association'
-                element={<AssociationPage />}
-              />
-              <Route path='/dashboard/services' element={<ServicesPage />} />
-              <Route path='/dashboard/images' element={<ImagesPage />} />
-              <Route path='/dashboard/reviews' element={<ReviewsPage />} />
-              <Route path='/dashboard/team' element={<TeamPage />} />
-              <Route
-                path='/dashboard/recruitment'
-                element={<RecruitmentPage />}
-              />
-              <Route path='/dashboard/settings' element={<Settings />} />
+              <Route element={<DashboardLayout />}>
+                <Route path='/dashboard' element={<DashboardIndex />} />
+                <Route
+                  path='/dashboard/association'
+                  element={<AssociationPage />}
+                />
+                <Route path='/dashboard/services' element={<ServicesPage />} />
+                <Route path='/dashboard/images' element={<ImagesPage />} />
+                <Route path='/dashboard/reviews' element={<ReviewsPage />} />
+                <Route path='/dashboard/team' element={<TeamPage />} />
+                <Route
+                  path='/dashboard/recruitment'
+                  element={<RecruitmentPage />}
+                />
+                <Route path='/dashboard/settings' element={<Settings />} />
+              </Route>
             </Route>
           </Routes>
         </Router>

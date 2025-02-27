@@ -7,6 +7,7 @@ import { ReviewForm } from '@/components/dashboard/reviews/ReviewForm'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
+import FloatingSaveButton from '@/components/FloatingSaveButton'
 
 interface Review {
   id: string
@@ -16,13 +17,24 @@ interface Review {
   description: string
 }
 
-const ReviewsPage = () => {
+interface DbReview {
+  id: string
+  title?: string | null
+  review_date?: string | null
+  stars?: number | null
+  description?: string | null
+}
+
+const ReviewsPage = (): JSX.Element => {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState<boolean>(true)
+  const [saving, setSaving] = useState<boolean>(false)
+  const [initialReviews, setInitialReviews] = useState<Review[]>([])
+  const [isModified, setIsModified] = useState<boolean>(false)
 
   // Fetch reviews from database on initial load
   useEffect(() => {
-    const fetchReviews = async () => {
+    const fetchReviews = async (): Promise<void> => {
       try {
         setLoading(true)
         const { data, error } = await supabase.from('avis').select('*')
@@ -31,13 +43,7 @@ const ReviewsPage = () => {
 
         if (data) {
           const formattedReviews = data.map(
-            (review: {
-              id: string
-              title: string
-              review_date: string
-              stars: number
-              description: string
-            }) => ({
+            (review: DbReview): Review => ({
               id: review.id,
               title: review.title || '',
               date: review.review_date || '',
@@ -46,6 +52,8 @@ const ReviewsPage = () => {
             })
           )
           setReviews(formattedReviews)
+          // Stocker les avis initiaux pour comparer les changements
+          setInitialReviews(JSON.parse(JSON.stringify(formattedReviews)))
         }
       } catch (error) {
         console.error('Error fetching reviews:', error)
@@ -58,7 +66,19 @@ const ReviewsPage = () => {
     fetchReviews()
   }, [])
 
-  const addReview = () => {
+  // Vérifier si des modifications ont été apportées
+  useEffect(() => {
+    if (initialReviews.length > 0) {
+      // Comparaison pour détecter les changements
+      const isChanged =
+        reviews.length !== initialReviews.length ||
+        JSON.stringify(reviews) !== JSON.stringify(initialReviews)
+
+      setIsModified(isChanged)
+    }
+  }, [reviews, initialReviews])
+
+  const addReview = (): void => {
     const newReview: Review = {
       id: crypto.randomUUID(),
       title: '',
@@ -69,7 +89,7 @@ const ReviewsPage = () => {
     setReviews([...reviews, newReview])
   }
 
-  const removeReview = (id: string) => {
+  const removeReview = (id: string): void => {
     setReviews(reviews.filter(review => review.id !== id))
   }
 
@@ -77,7 +97,7 @@ const ReviewsPage = () => {
     id: string,
     field: keyof Review,
     value: string | number
-  ) => {
+  ): void => {
     setReviews(
       reviews.map(review =>
         review.id === id ? { ...review, [field]: value } : review
@@ -85,8 +105,9 @@ const ReviewsPage = () => {
     )
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
+    setSaving(true)
     try {
       // Delete reviews that were removed locally
       const existingIds = reviews.map(review => review.id)
@@ -124,18 +145,23 @@ const ReviewsPage = () => {
       if (upsertError) throw upsertError
 
       toast.success('Avis enregistrés avec succès')
+
+      // Mettre à jour les avis initiaux après sauvegarde
+      setInitialReviews(JSON.parse(JSON.stringify(reviews)))
+      setIsModified(false)
     } catch (error) {
       console.error('Error saving reviews:', error)
       toast.error("Erreur lors de l'enregistrement des avis")
+    } finally {
+      setSaving(false)
     }
   }
 
   return (
     <SidebarProvider>
-      <div className='flex h-screen bg-gray-100 w-full'>
-        <DashboardSidebar />
-        <div className='flex-1 overflow-auto p-8'>
-          <div className='max-w-5xl mx-auto space-y-8'>
+      <div className='flex h-screen w-full'>
+        <div className='flex-1 overflow-auto p-4 md:p-8'>
+          <div className='mx-auto space-y-8'>
             <div className='flex justify-between items-center'>
               <h1 className='text-3xl font-bold'>Gestion des avis patients</h1>
               <Button onClick={addReview}>
@@ -146,7 +172,7 @@ const ReviewsPage = () => {
             {loading ? (
               <p>Chargement des avis...</p>
             ) : (
-              <div>
+              <div className='pb-16'>
                 <div className='grid gap-4'>
                   {reviews.map(review => (
                     <ReviewForm
@@ -157,16 +183,16 @@ const ReviewsPage = () => {
                     />
                   ))}
                 </div>
-
-                <Button
-                  type='submit'
-                  className='w-full mt-4'
-                  onClick={handleSubmit}
-                >
-                  Enregistrer les modifications
-                </Button>
               </div>
             )}
+
+            {/* Bouton flottant pour enregistrer */}
+            <FloatingSaveButton
+              onClick={handleSubmit}
+              loading={saving}
+              initialModified={isModified}
+              watchDependencies={[reviews]}
+            />
           </div>
         </div>
         <Toaster />

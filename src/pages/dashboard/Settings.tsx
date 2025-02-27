@@ -36,12 +36,11 @@ const Settings = () => {
   return (
     <SidebarProvider>
       <div className='flex min-h-screen w-full'>
-        <DashboardSidebar />
-        <div className='flex-1 p-8'>
+        <div className='flex-1 md:p-8'>
           <h1 className='text-3xl font-bold mb-8'>Contact Webmaster</h1>
 
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Formulaire de contact</CardTitle>
               </CardHeader>
@@ -118,7 +117,7 @@ const Settings = () => {
                   </Button>
                 </form>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card>
               <CardHeader>
@@ -167,6 +166,7 @@ const Settings = () => {
                       peut être réalisé sur un service de stockage (
                       <a
                         href='https://postimages.org/fr/'
+                        target='_blank'
                         className='underline text-primary'
                       >
                         PostImages

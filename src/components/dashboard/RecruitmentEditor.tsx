@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import { JobPostingForm } from './recruitment/JobPostingForm'
 import { RecruitmentModeToggle } from './recruitment/RecruitmentModeToggle'
+import FloatingSaveButton from '@/components/FloatingSaveButton'
 
 const ASSOCIATION_ID = 'd129aa9c-c316-4cea-b3dc-45699cac3be5'
 
@@ -16,13 +17,23 @@ interface JobPosting {
   imageUrl?: string
 }
 
-const RecruitmentEditor = () => {
-  const [isRecruiting, setIsRecruiting] = useState(false)
+interface InitialData {
+  isRecruiting: boolean
+  jobPostings: JobPosting[]
+}
+
+const RecruitmentEditor = (): JSX.Element => {
+  const [isRecruiting, setIsRecruiting] = useState<boolean>(false)
   const [jobPostings, setJobPostings] = useState<JobPosting[]>([])
+  const [initialData, setInitialData] = useState<InitialData | null>(null)
+  const [isModified, setIsModified] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [saving, setSaving] = useState<boolean>(false)
 
   useEffect(() => {
-    const fetchRecruitmentData = async () => {
+    const fetchRecruitmentData = async (): Promise<void> => {
       try {
+        setLoading(true)
         // Fetch association recruitment status
         const { data: associationData, error: associationError } =
           await supabase
@@ -33,9 +44,9 @@ const RecruitmentEditor = () => {
 
         if (associationError) throw associationError
 
-        if (associationData) {
-          setIsRecruiting(associationData.is_open_for_recruitment || false)
-        }
+        const recruitingStatus =
+          associationData?.is_open_for_recruitment || false
+        setIsRecruiting(recruitingStatus)
 
         // Fetch job postings
         const { data: jobsData, error: jobsError } = await supabase
@@ -45,8 +56,9 @@ const RecruitmentEditor = () => {
 
         if (jobsError) throw jobsError
 
+        let formattedJobs: JobPosting[] = []
         if (jobsData) {
-          const formattedJobs = jobsData.map(job => ({
+          formattedJobs = jobsData.map(job => ({
             id: job.id,
             title: job.title,
             description: job.description || '',
@@ -54,17 +66,39 @@ const RecruitmentEditor = () => {
           }))
           setJobPostings(formattedJobs)
         }
+
+        // Stocker les données initiales
+        setInitialData({
+          isRecruiting: recruitingStatus,
+          jobPostings: JSON.parse(JSON.stringify(formattedJobs))
+        })
       } catch (error) {
         console.error('Error fetching recruitment data:', error)
         toast.error('Erreur lors du chargement des données')
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchRecruitmentData()
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Vérifier les modifications
+  useEffect(() => {
+    if (initialData) {
+      const recruitingChanged = isRecruiting !== initialData.isRecruiting
+
+      const jobsChanged =
+        jobPostings.length !== initialData.jobPostings.length ||
+        JSON.stringify(jobPostings) !== JSON.stringify(initialData.jobPostings)
+
+      setIsModified(recruitingChanged || jobsChanged)
+    }
+  }, [isRecruiting, jobPostings, initialData])
+
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
+    setSaving(true)
     try {
       // Update recruitment status
       const { error: recruitmentError } = await supabase
@@ -99,13 +133,22 @@ const RecruitmentEditor = () => {
       }
 
       toast.success('Modifications enregistrées avec succès')
+
+      // Mettre à jour les données initiales
+      setInitialData({
+        isRecruiting,
+        jobPostings: JSON.parse(JSON.stringify(jobPostings))
+      })
+      setIsModified(false)
     } catch (error) {
       console.error('Error saving recruitment data:', error)
       toast.error("Erreur lors de l'enregistrement des modifications")
+    } finally {
+      setSaving(false)
     }
   }
 
-  const addJobPosting = () => {
+  const addJobPosting = (): void => {
     const newPosting: JobPosting = {
       id: Date.now().toString(),
       title: '',
@@ -115,7 +158,7 @@ const RecruitmentEditor = () => {
     setJobPostings([...jobPostings, newPosting])
   }
 
-  const removeJobPosting = (id: string) => {
+  const removeJobPosting = (id: string): void => {
     setJobPostings(jobPostings.filter(posting => posting.id !== id))
   }
 
@@ -123,7 +166,7 @@ const RecruitmentEditor = () => {
     id: string,
     field: keyof JobPosting,
     value: string
-  ) => {
+  ): void => {
     setJobPostings(postings =>
       postings.map(posting =>
         posting.id === id ? { ...posting, [field]: value } : posting
@@ -133,10 +176,10 @@ const RecruitmentEditor = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className='flex-1 p-6 overflow-auto'>
-        <div className='max-w-6xl mx-auto space-y-6'>
+      <form onSubmit={handleSubmit} className='flex-1 p-8 overflow-auto'>
+        <div className='mx-auto space-y-6'>
           <div className='flex justify-between items-center'>
-            <h2 className='text-2xl font-bold'>Gestion du recrutement</h2>
+            <h2 className='text-3xl font-bold'>Gestion du recrutement</h2>
           </div>
 
           <RecruitmentModeToggle
@@ -154,7 +197,7 @@ const RecruitmentEditor = () => {
                 </Button>
               </div>
 
-              <div className='grid gap-6 md:grid-cols-2'>
+              <div className='grid gap-6 md:grid-cols-2 pb-16'>
                 {jobPostings.map(posting => (
                   <JobPostingForm
                     key={posting.id}
@@ -167,9 +210,13 @@ const RecruitmentEditor = () => {
             </>
           )}
 
-          <Button type='submit' className='w-full'>
-            Enregistrer les modifications
-          </Button>
+          {/* Bouton flottant pour enregistrer */}
+          <FloatingSaveButton
+            onClick={handleSubmit}
+            loading={saving}
+            initialModified={isModified}
+            watchDependencies={[isRecruiting, jobPostings]}
+          />
         </div>
       </form>
       <Toaster />
