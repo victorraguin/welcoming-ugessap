@@ -40,27 +40,36 @@ const Navbar = () => {
   }, [])
 
   return (
-    <nav
-      className={`fixed w-full z-50 transition-all duration-300 bg-white/80`}
+    <header
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-white/95 shadow-md backdrop-blur-sm py-1'
+          : 'bg-white/80 py-2'
+      }`}
     >
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between h-16 items-center'>
-          <Link to='/' className='flex items-center space-x-2'>
-            <span className='text-2xl font-bold text-primary'>UGESSAP</span>
-          </Link>
+          <a href='/' className='flex items-center space-x-2 group'>
+            <span className='text-2xl font-bold text-primary transition-all duration-300 group-hover:scale-105'>
+              UGESSAP
+            </span>
+          </a>
 
-          {/* Desktop Navigation */}
-          <div className='hidden md:flex items-center space-x-8'>
-            <Link
-              to='/'
-              className={`text-sm font-medium transition-colors hover:text-primary ${
+          {/* Navigation pour desktop */}
+          <nav
+            className='hidden md:flex md:items-center md:space-x-6'
+            aria-label='Navigation principale'
+          >
+            <a
+              href='/'
+              className={`text-sm font-medium transition-all duration-200 hover:text-primary relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full ${
                 location.pathname === '/'
-                  ? 'text-primary'
-                  : 'text-foreground/80'
+                  ? 'text-primary after:w-full'
+                  : 'text-gray-700'
               }`}
             >
               Accueil
-            </Link>
+            </a>
             <Link
               to='/association'
               className={`text-sm font-medium transition-colors hover:text-primary ${
@@ -109,7 +118,7 @@ const Navbar = () => {
             >
               Contact
             </Link>
-          </div>
+          </nav>
 
           {/* Mobile Navigation Button */}
           <div className='md:hidden'>
@@ -190,7 +199,7 @@ const Navbar = () => {
           </div>
         </div>
       )}
-    </nav>
+    </header>
   )
 }
 

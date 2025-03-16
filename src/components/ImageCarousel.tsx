@@ -12,7 +12,9 @@ const ImageCarousel = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: 'start',
-    skipSnaps: false
+    skipSnaps: false,
+    inViewThreshold: 0,
+    dragFree: true
   })
 
   // Fetch images from Supabase
@@ -46,19 +48,22 @@ const ImageCarousel = () => {
   return (
     <section className='py-16 bg-white'>
       <div className='container mx-auto px-4'>
-        <h2 className='text-3xl font-bold text-center mb-12'>
+        <h2 className='text-3xl font-bold text-center mb-4'>
           Nos Activités en Images
         </h2>
+        <div className='w-20 h-1 bg-primary mx-auto rounded-full mb-12'></div>
         {images.length > 0 ? (
           <div
-            className='w-full max-w-4xl mx-auto overflow-hidden'
+            className='w-full max-w-md md:max-w-6xl mx-auto overflow-hidden'
             ref={emblaRef}
           >
-            <div className='flex space-x-4'>
-              {images.map(image => (
+            <div className='flex'>
+              {images.map((image, index) => (
                 <div
                   key={image.id}
-                  className='min-w-[150px] md:min-w-[200px] max-w-[300px] aspect-square overflow-hidden rounded-lg shadow'
+                  className={`min-w-[250px] md:min-w-[300px] max-w-[400px] aspect-square overflow-hidden rounded-lg shadow ${
+                    index < images.length ? 'mr-4' : ''
+                  }`}
                 >
                   <img
                     src={image.url}
