@@ -1,8 +1,23 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/integrations/supabase/client'
-import { Building2, Users, Trophy, Briefcase } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import {
+  Building2,
+  Users,
+  Trophy,
+  Briefcase,
+  MapPin,
+  Clock,
+  ArrowRight
+} from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from '@/components/ui/card'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import DOMPurify from 'dompurify'
@@ -77,7 +92,7 @@ const Association = () => {
         setLoading(true)
         setError(null)
 
-        // 1) Récupérer l’association (supposons qu’il n’y en ait qu’une)
+        // 1) Récupérer l'association (supposons qu'il n'y en ait qu'une)
         const { data: assocData, error: assocError } = await supabase
           .from('association')
           .select('*')
@@ -101,12 +116,12 @@ const Association = () => {
         if (jobsError) throw jobsError
         setJobs(jobsData || [])
 
-        // 3) Récupérer l’équipe
+        // 3) Récupérer l'équipe
         const { data: teamData, error: teamError } = await supabase
           .from('team')
           .select('*')
         if (teamError) {
-          // On log l’erreur, mais on ne bloque pas
+          // On log l'erreur, mais on ne bloque pas
           console.error('Erreur fetch team:', teamError)
         } else {
           setTeam(teamData || [])
@@ -128,17 +143,46 @@ const Association = () => {
 
   if (error) {
     return (
-      <p className='p-8 text-center text-red-500'>
-        Erreur lors du chargement : {error}
-      </p>
+      <div className='min-h-screen flex flex-col'>
+        <Navbar />
+        <div className='flex-1 flex items-center justify-center'>
+          <div className='text-center p-8 max-w-md mx-auto bg-red-50 rounded-xl shadow-md'>
+            <div className='flex justify-center mb-4'>
+              <div className='p-3 bg-red-100 rounded-full'>
+                <Briefcase className='w-8 h-8 text-red-500' />
+              </div>
+            </div>
+            <h2 className='text-2xl font-bold text-red-700 mb-2'>Erreur</h2>
+            <p className='text-red-600'>{error}</p>
+            <Button
+              variant='outline'
+              className='mt-4'
+              onClick={() => window.location.reload()}
+            >
+              Réessayer
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
     )
   }
 
   if (!association) {
-    return <p className='p-8 text-center'>Aucune association à afficher.</p>
+    return (
+      <div className='min-h-screen flex flex-col'>
+        <Navbar />
+        <div className='flex-1 flex items-center justify-center'>
+          <p className='p-8 text-center text-gray-500'>
+            Aucune association à afficher.
+          </p>
+        </div>
+        <Footer />
+      </div>
+    )
   }
 
-  // On déstructure l’association
+  // On déstructure l'association
   const {
     name,
     short_description,
@@ -163,23 +207,29 @@ const Association = () => {
 
         <main className='flex-1'>
           {/* Hero Section */}
-          <section className='bg-primary/5 py-20 md:py-24'>
+          <section className='bg-gradient-to-b from-primary/5 to-white py-20 md:py-24'>
             <div className='container mx-auto px-4'>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
-                <div>
-                  <h1 className='text-4xl md:text-5xl font-bold mb-6 slide-up'>
-                    {name}
-                  </h1>
-                  <p className='text-lg text-gray-600 mb-8 slide-up'>
+                <div className='space-y-8'>
+                  <div className='flex items-center gap-4'>
+                    <div className='p-3 bg-primary/10 rounded-xl'>
+                      <Building2 className='w-12 h-12 text-primary' />
+                    </div>
+                    <h1 className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent'>
+                      {name}
+                    </h1>
+                  </div>
+                  <p className='text-lg text-gray-600 leading-relaxed'>
                     {short_description}
                   </p>
                 </div>
-                {/* Image illustrant l’association (à adapter selon vos besoins) */}
-                <div className='relative'>
+                {/* Image illustrant l'association */}
+                <div className='relative group'>
+                  <div className='absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000'></div>
                   <img
                     src={logo}
                     alt={name}
-                    className='rounded-lg shadow-xl w-full fade-in'
+                    className='relative rounded-lg shadow-2xl w-full object-cover h-[400px] group-hover:scale-[1.01] transition duration-500'
                   />
                 </div>
               </div>
@@ -189,16 +239,54 @@ const Association = () => {
           {/* Mission Section */}
           <section className='py-16 bg-white'>
             <div className='container mx-auto px-4'>
-              <h2 className='text-3xl font-bold text-center mb-12'>
-                Notre Mission
-              </h2>
-              <div className='max-w-4xl mx-auto space-y-6 text-gray-600'>
-                <div
-                  className='text-lg'
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(association?.description || '')
-                  }}
-                ></div>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-start'>
+                {/* Mission */}
+                <div className='bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300'>
+                  <h2 className='text-2xl font-bold mb-6 text-primary'>
+                    Notre Mission
+                  </h2>
+                  <div className='space-y-6 text-gray-600'>
+                    <div
+                      className='text-lg leading-relaxed'
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(
+                          association?.description || ''
+                        )
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Points clés */}
+                {key_points.length > 0 && (
+                  <div className='bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300'>
+                    <h2 className='text-2xl font-bold mb-6 text-primary'>
+                      Nos points clés
+                    </h2>
+                    <div className='space-y-6'>
+                      {key_points.map((point, idx) => {
+                        const IconComponent =
+                          iconsMap[point.icon as keyof typeof iconsMap] ||
+                          Building2
+                        return (
+                          <div key={idx} className='flex gap-4 items-start'>
+                            <div className='p-2 bg-primary/10 rounded-lg'>
+                              <IconComponent className='w-6 h-6 text-primary' />
+                            </div>
+                            <div>
+                              <h3 className='text-lg font-semibold mb-1'>
+                                {point.title}
+                              </h3>
+                              <p className='text-gray-600'>
+                                {point.description}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </section>
@@ -206,61 +294,39 @@ const Association = () => {
           {/* Services */}
           <ServicesSection />
 
-          {/* Points clés */}
-          {key_points.length > 0 && (
-            <section className='py-16'>
-              <div className='container mx-auto px-4'>
-                <h2 className='text-3xl font-bold text-center mb-12'>
-                  Nos points clés
-                </h2>
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-                  {key_points.map((point, idx) => {
-                    const IconComponent =
-                      iconsMap[point.icon as keyof typeof iconsMap] || Building2
-                    return (
-                      <Card key={idx} className='card-hover'>
-                        <CardContent className='p-6'>
-                          <IconComponent className='w-12 h-12 text-primary mb-4' />
-                          <h3 className='text-xl font-semibold mb-2'>
-                            {point.title}
-                          </h3>
-                          <p className='text-gray-600'>{point.description}</p>
-                        </CardContent>
-                      </Card>
-                    )
-                  })}
-                </div>
-              </div>
-            </section>
-          )}
-
           {/* Équipe */}
           {team.length > 0 && (
-            <section className='py-16 bg-gray-50'>
+            <section className='py-16 bg-white'>
               <div className='container mx-auto px-4'>
-                <h2 className='text-3xl font-bold text-center mb-12'>
+                <h2 className='text-3xl font-bold text-center mb-4'>
                   Notre Équipe
                 </h2>
+                <div className='w-20 h-1 bg-primary mx-auto mb-12 rounded-full'></div>
+
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
                   {team.map(member => (
-                    <Card key={member.id} className='card-hover'>
+                    <Card
+                      key={member.id}
+                      className='group hover:shadow-xl transition-all duration-300 overflow-hidden'
+                    >
                       <CardContent className='p-6 text-center'>
-                        <Avatar className='w-24 h-24 mx-auto mb-4'>
+                        <Avatar className='w-32 h-32 mx-auto mb-6 ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300'>
                           <AvatarImage
                             src={member.image}
                             alt={member.person_name}
+                            className='object-cover'
                           />
-                          <AvatarFallback>
+                          <AvatarFallback className='bg-primary/10 text-primary text-xl'>
                             {member.person_name
                               .split(' ')
                               .map(n => n[0])
                               .join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <h3 className='text-xl font-semibold mb-1'>
+                        <h3 className='text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300'>
                           {member.person_name}
                         </h3>
-                        <p className='text-primary font-medium mb-2'>
+                        <p className='text-primary/80 font-medium'>
                           {member.job_title}
                         </p>
                       </CardContent>
@@ -273,27 +339,36 @@ const Association = () => {
 
           {/* Partenaires */}
           {partners.length > 0 && (
-            <section className='bg-gray-50 py-16'>
+            <section className='py-16 bg-gradient-to-b from-white to-gray-50'>
               <div className='container mx-auto px-4'>
-                <h2 className='text-3xl font-bold text-center mb-12'>
+                <h2 className='text-3xl font-bold text-center mb-4'>
                   Nos partenaires
                 </h2>
+                <div className='w-20 h-1 bg-primary mx-auto mb-12 rounded-full'></div>
+
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
                   {partners.map((partner, index) => (
-                    <Card key={index} className='card-hover'>
-                      <CardContent className='p-6 text-center'>
+                    <Card
+                      key={index}
+                      className='group hover:shadow-xl transition-all duration-300 border-none bg-white/50 backdrop-blur-sm'
+                    >
+                      <CardHeader className='text-center'>
                         {partner.logoUrl && (
-                          <img
-                            src={partner.logoUrl}
-                            alt={partner.name}
-                            className='w-24 h-24 object-contain mx-auto mb-4'
-                          />
+                          <div className='mx-auto mb-6 p-4 bg-primary/5 rounded-xl group-hover:scale-110 transition-transform duration-300 w-24 h-24 flex items-center justify-center'>
+                            <img
+                              src={partner.logoUrl}
+                              alt={partner.name}
+                              className='max-w-full max-h-full object-contain'
+                            />
+                          </div>
                         )}
-                        <h3 className='text-xl font-semibold mb-2'>
+                        <CardTitle className='text-xl mb-4'>
                           {partner.name}
-                        </h3>
-                        <p className='text-gray-600'>{partner.description}</p>
-                      </CardContent>
+                        </CardTitle>
+                        <CardDescription className='text-gray-600 text-base'>
+                          {partner.description}
+                        </CardDescription>
+                      </CardHeader>
                     </Card>
                   ))}
                 </div>
@@ -302,31 +377,44 @@ const Association = () => {
           )}
 
           {/* Recrutement */}
-          {/* On n’affiche cette section que si is_open_for_recruitment === true */}
           {is_open_for_recruitment && jobs.length > 0 && (
-            <section className='py-16'>
+            <section className='py-16 bg-white'>
               <div className='container mx-auto px-4'>
-                <h2 className='text-3xl font-bold text-center mb-12'>
+                <h2 className='text-3xl font-bold text-center mb-4'>
                   Nous recrutons
                 </h2>
-                <div className='max-w-2xl mx-auto'>
+                <div className='w-20 h-1 bg-primary mx-auto mb-12 rounded-full'></div>
+
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto'>
                   {jobs.map(job => (
-                    <Card key={job.id} className='mb-4 card-hover'>
-                      <CardContent className='p-6'>
-                        <div className='flex flex-col md:flex-row md:justify-between md:items-center'>
-                          <div className='mb-4 md:mb-0'>
-                            <h3 className='text-xl font-semibold'>
-                              {job.title}
-                            </h3>
-                            <p className='text-gray-600'>{job.description}</p>
-                          </div>
-                          <Link
-                            to={`/contact?tab=recruitment&position=${job.title}`}
-                            className='text-primary hover:underline mt-4 md:mt-0 md:ml-4'
-                          >
-                            Postuler
-                          </Link>
+                    <Card
+                      key={job.id}
+                      className='overflow-hidden group hover:shadow-xl transition-all duration-300'
+                    >
+                      {job.image && (
+                        <div className='h-48 overflow-hidden'>
+                          <img
+                            src={job.image}
+                            alt={job.title}
+                            className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-105'
+                          />
                         </div>
+                      )}
+                      <CardHeader>
+                        <CardTitle className='text-xl group-hover:text-primary transition-colors duration-300'>
+                          {job.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className='space-y-4'>
+                        <p className='text-gray-600'>{job.description}</p>
+                        <Link
+                          to={`/contact?tab=recruitment&position=${job.title}`}
+                        >
+                          <Button className='w-full group'>
+                            <span>Postuler maintenant</span>
+                            <ArrowRight className='ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform' />
+                          </Button>
+                        </Link>
                       </CardContent>
                     </Card>
                   ))}
