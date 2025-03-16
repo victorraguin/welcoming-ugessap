@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '@/integrations/supabase/client' // ou votre client supabase
+import { supabase } from '@/integrations/supabase/client'
 import { Service } from '@/types/service'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +15,7 @@ import Footer from '@/components/Footer'
 import * as Icons from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getButtonAction } from '@/lib/utils'
+import { MapPin } from 'lucide-react'
 
 interface TeamMember {
   id: string
@@ -72,21 +73,23 @@ const ServicePage = ({ service }: ServicePageProps) => {
 
       <main className='flex-1'>
         {/* Hero Section */}
-        <section className='bg-primary/5 py-20 md:py-24'>
+        <section className='bg-gradient-to-b from-primary/5 to-white py-20 md:py-24'>
           <div className='container mx-auto px-4'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
-              <div className='space-y-6'>
+              <div className='space-y-8'>
                 <div className='flex items-center gap-4'>
-                  <IconComponent className='w-12 h-12 text-primary' />
-                  <h1 className='text-4xl md:text-5xl font-bold'>
+                  <div className='p-3 bg-primary/10 rounded-xl'>
+                    <IconComponent className='w-12 h-12 text-primary' />
+                  </div>
+                  <h1 className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent'>
                     {service.title}
                   </h1>
                 </div>
-                <p className='text-lg text-gray-600'>
+                <p className='text-lg text-gray-600 leading-relaxed'>
                   {service.shortDescription}
                 </p>
 
-                {/* Boutons (si besoin) */}
+                {/* Boutons */}
                 {service.buttons && service.buttons.length > 0 && (
                   <div className='flex flex-wrap gap-4'>
                     {service.buttons.map(button => {
@@ -95,7 +98,7 @@ const ServicePage = ({ service }: ServicePageProps) => {
                         <Button
                           key={button.id}
                           variant='default'
-                          className='mb-2 w-fit'
+                          className='mb-2 w-fit hover:scale-105 transition-transform duration-200'
                           onClick={() => {
                             if (action !== '#') {
                               window.open(
@@ -116,38 +119,47 @@ const ServicePage = ({ service }: ServicePageProps) => {
                 )}
               </div>
               {service.images && service.images.length > 0 && (
-                <div className='relative'>
+                <div className='relative group'>
+                  <div className='absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000'></div>
                   <img
                     src={service.images[0].url}
                     alt={service.images[0].alt}
-                    className='rounded-lg shadow-xl w-full object-cover h-[400px]'
+                    className='relative rounded-lg shadow-2xl w-full object-cover h-[400px] group-hover:scale-[1.01] transition duration-500'
                   />
                 </div>
               )}
             </div>
           </div>
         </section>
+
         {/* Mission + Adresse et Horaires */}
         <section className='py-16 bg-white'>
           <div className='container mx-auto px-4'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-start'>
               {/* Mission */}
-              <div>
-                <h2 className='text-2xl font-bold mb-4'>Notre Mission</h2>
+              <div className='bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300'>
+                <h2 className='text-2xl font-bold mb-6 text-primary'>
+                  Notre Mission
+                </h2>
                 <div className='space-y-6 text-gray-600'>
-                  <p className='text-lg'>{service.longDescription}</p>
+                  <p className='text-lg leading-relaxed'>
+                    {service.longDescription}
+                  </p>
                 </div>
               </div>
 
               {/* Adresse et Horaires */}
               {service.address && service.hours && (
                 <div className='space-y-6'>
-                  <div className='bg-gray-100 p-6 rounded-lg shadow-lg space-y-4'>
+                  <div className='bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300'>
                     {/* Adresse */}
-                    <div className='flex items-start space-x-4'>
-                      <div>
-                        <h3 className='text-lg font-semibold'>Adresse</h3>
-                        <p className='text-gray-600'>
+                    <div className='flex items-start space-x-6 mb-8'>
+                      <div className='flex-grow'>
+                        <h3 className='text-xl font-semibold text-primary mb-4 flex items-center gap-2'>
+                          <MapPin className='h-5 w-5' />
+                          Adresse
+                        </h3>
+                        <p className='text-gray-600 text-lg'>
                           {service.address.street}
                           <br />
                           {service.address.postalCode} {service.address.city}
@@ -156,8 +168,8 @@ const ServicePage = ({ service }: ServicePageProps) => {
                       {/* Bouton Localisation */}
                       {service.address.maps_url && (
                         <Button
-                          variant='default'
-                          className='ml-auto'
+                          variant='outline'
+                          className='hover:scale-105 transition-transform duration-200'
                           onClick={() =>
                             window.open(
                               service.address.maps_url,
@@ -166,6 +178,7 @@ const ServicePage = ({ service }: ServicePageProps) => {
                             )
                           }
                         >
+                          <MapPin className='mr-2 h-4 w-4' />
                           Localisez-nous
                         </Button>
                       )}
@@ -173,28 +186,52 @@ const ServicePage = ({ service }: ServicePageProps) => {
 
                     {/* Horaires */}
                     <div>
-                      <h3 className='text-lg font-semibold'>Horaires</h3>
-                      <div className='grid grid-cols-2 gap-2 text-gray-600'>
+                      <h3 className='text-xl font-semibold text-primary mb-4 flex items-center gap-2'>
+                        <Icons.Clock className='h-5 w-5' />
+                        Horaires
+                      </h3>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-600'>
                         {service.hours.monday && (
-                          <p>Lundi: {service.hours.monday}</p>
+                          <div className='p-3 bg-gray-50 rounded-lg'>
+                            <span className='font-medium'>Lundi:</span>{' '}
+                            {service.hours.monday}
+                          </div>
                         )}
                         {service.hours.tuesday && (
-                          <p>Mardi: {service.hours.tuesday}</p>
+                          <div className='p-3 bg-gray-50 rounded-lg'>
+                            <span className='font-medium'>Mardi:</span>{' '}
+                            {service.hours.tuesday}
+                          </div>
                         )}
                         {service.hours.wednesday && (
-                          <p>Mercredi: {service.hours.wednesday}</p>
+                          <div className='p-3 bg-gray-50 rounded-lg'>
+                            <span className='font-medium'>Mercredi:</span>{' '}
+                            {service.hours.wednesday}
+                          </div>
                         )}
                         {service.hours.thursday && (
-                          <p>Jeudi: {service.hours.thursday}</p>
+                          <div className='p-3 bg-gray-50 rounded-lg'>
+                            <span className='font-medium'>Jeudi:</span>{' '}
+                            {service.hours.thursday}
+                          </div>
                         )}
                         {service.hours.friday && (
-                          <p>Vendredi: {service.hours.friday}</p>
+                          <div className='p-3 bg-gray-50 rounded-lg'>
+                            <span className='font-medium'>Vendredi:</span>{' '}
+                            {service.hours.friday}
+                          </div>
                         )}
                         {service.hours.saturday && (
-                          <p>Samedi: {service.hours.saturday}</p>
+                          <div className='p-3 bg-gray-50 rounded-lg'>
+                            <span className='font-medium'>Samedi:</span>{' '}
+                            {service.hours.saturday}
+                          </div>
                         )}
                         {service.hours.sunday && (
-                          <p>Dimanche: {service.hours.sunday}</p>
+                          <div className='p-3 bg-gray-50 rounded-lg'>
+                            <span className='font-medium'>Dimanche:</span>{' '}
+                            {service.hours.sunday}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -207,24 +244,29 @@ const ServicePage = ({ service }: ServicePageProps) => {
 
         {/* Points clés */}
         {service.keyPoints && service.keyPoints.length > 0 && (
-          <section className='py-16 bg-gray-50'>
+          <section className='py-16 bg-gradient-to-b from-white to-gray-50'>
             <div className='container mx-auto px-4'>
               <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
                 {service.keyPoints.map(point => {
                   const KeyPointIcon = Icons[point.icon] || Icons.Info
                   return (
-                    <Card key={point.id} className='card-hover'>
+                    <Card
+                      key={point.id}
+                      className='group hover:shadow-xl transition-all duration-300 border-none bg-white/50 backdrop-blur-sm'
+                    >
                       <CardHeader className='text-center'>
-                        <div className='mx-auto mb-4'>
+                        <div className='mx-auto mb-6 p-4 bg-primary/10 rounded-xl group-hover:scale-110 transition-transform duration-300'>
                           <KeyPointIcon className='w-12 h-12 text-primary' />
                         </div>
-                        <CardTitle className='text-xl'>{point.title}</CardTitle>
-                        <CardDescription className='text-gray-600'>
+                        <CardTitle className='text-xl mb-4'>
+                          {point.title}
+                        </CardTitle>
+                        <CardDescription className='text-gray-600 text-base'>
                           {point.description}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        {/* Ajoutez plus d'infos si besoin */}
+                        {/* Contenu additionnel si nécessaire */}
                       </CardContent>
                     </Card>
                   )
@@ -236,46 +278,60 @@ const ServicePage = ({ service }: ServicePageProps) => {
 
         {/* Équipe */}
         {teamMembers && teamMembers.length > 0 && (
-          <section className='py-16 bg-gray-50'>
+          <section className='py-16 bg-white'>
             <div className='container mx-auto px-4'>
-              <h2 className='text-3xl font-bold text-center mb-12'>
+              <h2 className='text-3xl font-bold text-center mb-4'>
                 Notre Équipe
               </h2>
+              <div className='w-20 h-1 bg-primary mx-auto mb-12 rounded-full'></div>
 
-              {loadingTeam && <p>Chargement de l'équipe...</p>}
-              {errorTeam && (
-                <p className='text-center text-red-500'>
-                  Erreur chargement équipe : {errorTeam}
-                </p>
+              {loadingTeam && (
+                <div className='text-center'>
+                  <Icons.Loader2 className='animate-spin h-8 w-8 mx-auto text-primary' />
+                  <p className='mt-2'>Chargement de l'équipe...</p>
+                </div>
               )}
+
+              {errorTeam && (
+                <div className='text-center text-red-500 p-4 bg-red-50 rounded-lg'>
+                  <Icons.AlertTriangle className='h-8 w-8 mx-auto mb-2' />
+                  <p>Erreur chargement équipe : {errorTeam}</p>
+                </div>
+              )}
+
               {!loadingTeam && !errorTeam && teamMembers.length === 0 && (
-                <p className='text-center'>Aucun membre de l'équipe trouvé.</p>
+                <p className='text-center text-gray-500'>
+                  Aucun membre de l'équipe trouvé.
+                </p>
               )}
 
               {!loadingTeam && !errorTeam && teamMembers.length > 0 && (
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
                   {teamMembers.map(member => (
-                    <Card key={member.id} className='card-hover'>
+                    <Card
+                      key={member.id}
+                      className='group hover:shadow-xl transition-all duration-300 overflow-hidden'
+                    >
                       <CardContent className='p-6 text-center'>
-                        <Avatar className='w-24 h-24 mx-auto mb-4'>
+                        <Avatar className='w-32 h-32 mx-auto mb-6 ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300'>
                           <AvatarImage
                             src={member.image}
                             alt={member.person_name}
+                            className='object-cover'
                           />
-                          <AvatarFallback>
+                          <AvatarFallback className='bg-primary/10 text-primary text-xl'>
                             {member.person_name
                               .split(' ')
                               .map(n => n[0])
                               .join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <h3 className='text-xl font-semibold mb-1'>
+                        <h3 className='text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300'>
                           {member.person_name}
                         </h3>
-                        <p className='text-primary font-medium mb-2'>
+                        <p className='text-primary/80 font-medium'>
                           {member.job_title}
                         </p>
-                        {/* Si vous avez une description en BDD, vous pouvez l'afficher ici */}
                       </CardContent>
                     </Card>
                   ))}
@@ -287,19 +343,30 @@ const ServicePage = ({ service }: ServicePageProps) => {
 
         {/* Installations / Images */}
         {service.images && service.images.length > 0 && (
-          <section className='py-16 bg-gray-50'>
+          <section className='py-16 bg-gradient-to-b from-white to-gray-50'>
             <div className='container mx-auto px-4'>
-              <h2 className='text-3xl font-bold text-center mb-12'>
+              <h2 className='text-3xl font-bold text-center mb-4'>
                 Nos installations
               </h2>
+              <div className='w-20 h-1 bg-primary mx-auto mb-12 rounded-full'></div>
+
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
                 {service.images.map(image => (
-                  <div key={image.id} className='space-y-4'>
+                  <div
+                    key={image.id}
+                    className='group relative overflow-hidden rounded-2xl shadow-lg'
+                  >
+                    <div className='absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                     <img
                       src={image.url}
                       alt={image.alt}
-                      className='rounded-lg shadow-md w-full h-64 object-cover'
+                      className='w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500'
                     />
+                    {image.alt && (
+                      <div className='absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300'>
+                        <p className='text-sm font-medium'>{image.alt}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

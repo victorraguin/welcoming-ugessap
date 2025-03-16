@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.ugessap.fr/sitemap.xml
+
+Disallow: /login
+Disallow: /admin
+Disallow: /dashboard 
