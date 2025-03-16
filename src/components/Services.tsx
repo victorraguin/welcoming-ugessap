@@ -53,9 +53,10 @@ const ServicesSection = () => {
 
     const todayHours = hours[day]
 
-    if (!todayHours || todayHours === 'Fermé') {
-      for (let i = 1; i <= 7; i++) {
-        const nextDayIndex = (englishDays.indexOf(day) + i) % 7
+    // Fonction pour trouver la prochaine ouverture
+    const findNextOpening = (startDay: string, startIndex: number = 0) => {
+      for (let i = startIndex; i <= 7; i++) {
+        const nextDayIndex = (englishDays.indexOf(startDay) + i) % 7
         const nextDay = englishDays[nextDayIndex]
         const nextDayHours = hours[nextDay]
 
@@ -81,12 +82,19 @@ const ServicesSection = () => {
           }
         }
       }
+      return null
+    }
 
-      return {
-        status: 'Fermé',
-        color: 'text-red-500 bg-red-50',
-        icon: 'Clock'
-      }
+    // Si fermé aujourd'hui, chercher la prochaine ouverture
+    if (!todayHours || todayHours === 'Fermé') {
+      const nextOpening = findNextOpening(day, 1)
+      return (
+        nextOpening || {
+          status: 'Fermé',
+          color: 'text-red-500 bg-red-50',
+          icon: 'Clock'
+        }
+      )
     }
 
     const periods = todayHours.split(',').map(period => {
@@ -97,15 +105,20 @@ const ServicesSection = () => {
       return { start, end }
     })
 
+    // Vérifier les périodes d'ouverture d'aujourd'hui
+    let isBeforeFirstPeriod = true
     for (const { start, end } of periods) {
       if (time >= start && time < end) {
         if (end - time <= 30) {
           const closingTime = `${Math.floor(end / 60)}h${end % 60 || '00'}`
-          return {
-            status: `Ferme bientôt (${closingTime})`,
-            color: 'text-orange-500 bg-orange-50',
-            icon: 'AlertCircle'
-          }
+          const nextOpening = findNextOpening(day)
+          return (
+            nextOpening || {
+              status: `Ferme bientôt (${closingTime})`,
+              color: 'text-orange-500 bg-orange-50',
+              icon: 'AlertCircle'
+            }
+          )
         }
         const closingTime = `${Math.floor(end / 60)}h${end % 60 || '00'}`
         return {
@@ -114,21 +127,26 @@ const ServicesSection = () => {
           icon: 'CheckCircle'
         }
       }
-      if (start - time > 0 && start - time <= 30) {
+      if (time < start && isBeforeFirstPeriod) {
         const openingTime = `${Math.floor(start / 60)}h${start % 60 || '00'}`
         return {
-          status: `Ouvre bientôt (${openingTime})`,
-          color: 'text-blue-500 bg-blue-50',
+          status: `Fermé - Ouvre à ${openingTime}`,
+          color: 'text-red-500 bg-blue-50',
           icon: 'Clock'
         }
       }
+      isBeforeFirstPeriod = false
     }
 
-    return {
-      status: 'Fermé',
-      color: 'text-red-500 bg-red-50',
-      icon: 'Clock'
-    }
+    // Si on est après la dernière période, chercher la prochaine ouverture
+    const nextOpening = findNextOpening(day, 1)
+    return (
+      nextOpening || {
+        status: 'Fermé',
+        color: 'text-red-500 bg-red-50',
+        icon: 'Clock'
+      }
+    )
   }
 
   const getIconComponent = (
